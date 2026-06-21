@@ -1,8 +1,8 @@
-# WIP VCV Rack plugin
+# Sporkbomb VCV Rack plugin
 
 ## Manuals
 
-### Seqhub
+### EntropyPool
 
 ![Seqhub](./res/Seqhub.png)
 

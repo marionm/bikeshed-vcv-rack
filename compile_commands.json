@@ -21,11 +21,11 @@
       "-march=nehalem",
       "-c",
       "-o",
-      "build/src/seqhub.cpp.o",
-      "src/seqhub.cpp"
+      "build/src/EntropyPool.cpp.o",
+      "src/EntropyPool.cpp"
     ],
     "directory": "/mnt/c/Users/mikem/code/vcvrack",
-    "file": "/mnt/c/Users/mikem/code/vcvrack/src/seqhub.cpp",
-    "output": "/mnt/c/Users/mikem/code/vcvrack/build/src/seqhub.cpp.o"
+    "file": "/mnt/c/Users/mikem/code/vcvrack/src/IllicitFerret.cpp",
+    "output": "/mnt/c/Users/mikem/code/vcvrack/build/src/IllicitFerret.cpp.o"
   }
 ]

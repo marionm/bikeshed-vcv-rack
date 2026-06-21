@@ -59,15 +59,14 @@ struct Checkbox : widget::OpaqueWidget {
 };
 
 struct IntegrationsModal : ui::MenuOverlay {
-  std::function<void(const std::vector<float>&, const std::string&)> onLoaded;
+  std::function<void(const std::vector<float>&)> onLoaded;
   std::unique_ptr<github::GitHubIntegration> api = std::unique_ptr<github::GitHubIntegration>(new github::GitHubIntegration());
   AuthFieldModal* authField = nullptr;
   Checkbox* weekendsCheckbox = nullptr;
   ui::Label* statusLabel = nullptr;
   bool wasFetching = false;
 
-  IntegrationsModal(std::function<void(const std::vector<float>&, const std::string&)> onLoaded)
-      : onLoaded(std::move(onLoaded)) {
+  IntegrationsModal(std::function<void(const std::vector<float>&)> onLoaded) : onLoaded(std::move(onLoaded)) {
     // Darken the background of the rack
     bgColor = nvgRGBA(0, 0, 0, 160);
 
@@ -90,6 +89,7 @@ struct IntegrationsModal : ui::MenuOverlay {
     modalBox->box.size = Vec(400, 195);
 
     ui::MenuLabel* title = new ui::MenuLabel();
+    // TODO: Better description of private vs public access
     title->text = "GitHub Token\nEnter to use contribution history as sequencer data\nOptionally prefix with <username>@\nNot saved with patch";
     title->box.pos = Vec(16, 20);
     modalBox->addChild(title);
@@ -163,14 +163,12 @@ struct IntegrationsModal : ui::MenuOverlay {
       wasFetching = true;
     } else if (wasFetching && status == github::RefreshStatus::Idle) {
       if (api->lastFetchSucceeded.load() && onLoaded) {
-        std::vector<float> contributions;
-        std::string startDate;
+        std::vector<float> values;
         {
           std::lock_guard<std::mutex> lock(api->dataMutex);
-          contributions = api->contributionsPerDay;
-          startDate = api->startDate;
+          values = api->contributionsPerDay;
         }
-        onLoaded(contributions, startDate);
+        onLoaded(values);
       }
       requestDelete();
       return;

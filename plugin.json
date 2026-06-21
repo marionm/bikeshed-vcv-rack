@@ -1,10 +1,10 @@
 {
-  "slug": "wip",
-  "name": "wip",
+  "slug": "sporkbomb",
+  "name": "sporkbomb",
   "version": "2.0.0",
   "license": "MIT",
-  "brand": "wip",
-  "author": "",
+  "brand": "sporkbomb",
+  "author": "sporkbomb",
   "authorEmail": "",
   "authorUrl": "",
   "pluginUrl": "",
@@ -14,8 +14,8 @@
   "changelogUrl": "",
   "modules": [
     {
-      "slug": "Seqhub",
-      "name": "Seqhub",
+      "slug": "EntropyPool",
+      "name": "Entropy Pool",
       "tags": ["Sequencer"]
     }
   ]
