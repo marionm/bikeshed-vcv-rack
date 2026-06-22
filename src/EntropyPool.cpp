@@ -4,6 +4,8 @@
 
 using namespace rack;
 
+static constexpr int ENTROPY_POOL_VALUES_SIZE = 240;
+
 struct EntropyPool : Module {
   enum ParamId {
     RUN_PARAM,
@@ -43,7 +45,7 @@ struct EntropyPool : Module {
     NUM_LIGHTS
   };
 
-  int valuesSize = 240;
+  int valuesSize = ENTROPY_POOL_VALUES_SIZE;
   std::vector<float> values;
   uint32_t seed = 0;
   dsp::SchmittTrigger randomButtonTrigger;
@@ -142,7 +144,7 @@ struct Grid : Widget {
 
   void draw(const DrawArgs &args) override {
     try {
-      const int size = module ? (int)module->values.size() : module->valuesSize;
+      const int size = module ? (int)module->values.size() : ENTROPY_POOL_VALUES_SIZE;
       for (int i = 0; i < size; i++) {
         int x = 1 + (i % 24) * (width + 1);
         int y = 1 + (i / 24) * (width + 1);
