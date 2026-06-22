@@ -23,7 +23,7 @@ enum class RefreshStatus {
 struct GitHubIntegration {
   std::string auth;
   std::vector<float> contributionsPerDay;
-  std::string startDate;
+  int targetSize = 64;
   bool includeWeekends = true;
 
   std::thread worker;
@@ -132,15 +132,11 @@ struct GitHubIntegration {
 
       DEBUG("request:\n%s", body.c_str());
 
-      // Only 1 year of data in this resposne
-      // TODO: Make two requests if we need more than that (e.g. weekends excluded)
       if (auto res = client.Post("/graphql", headers, jsonBody.dump(), "application/json")) {
         if (res->status == 200) {
           auto json = nlohmann::json::parse(res->body);
           const auto& contributions = json["data"][responseScope]["contributionsCollection"];
-
-          std::string tempStartDate = contributions["startedAt"].get<std::string>();
-          setContributionsPerDay(contributions["contributionCalendar"], tempStartDate);
+          setContributionsPerDay(contributions["contributionCalendar"]);
           return;
         }
       }
@@ -152,7 +148,7 @@ struct GitHubIntegration {
     refreshStatus.store(RefreshStatus::Error);
   }
 
-  void setContributionsPerDay(const nlohmann::json& contributions, const std::string& tempStartDate) {
+  void setContributionsPerDay(const nlohmann::json& contributions) {
     std::vector<int> values;
     int maxValue = 0;
     int weeksSize = (int)contributions["weeks"].size();
@@ -171,13 +167,13 @@ struct GitHubIntegration {
           maxValue = value;
         }
 
-        if (values.size() == 240) {
+        if ((int)values.size() == targetSize) {
           goto finish;
         }
       }
     }
 
-    while (values.size() < 240) {
+    while ((int)values.size() < targetSize) {
       values.push_back(0);
     }
 
@@ -186,14 +182,14 @@ struct GitHubIntegration {
     std::reverse(values.begin(), values.end());
 
     std::vector<float> normalizedValues;
+    float scale = maxValue > 0 ? 1.f / (float)maxValue : 0.f;
     for (int value : values) {
-      normalizedValues.push_back((float)value / maxValue * 10.f);
+      normalizedValues.push_back((float)value * scale);
     }
 
     {
       std::lock_guard<std::mutex> lock(dataMutex);
       this->contributionsPerDay = std::move(normalizedValues);
-      this->startDate = tempStartDate;
     }
 
     lastFetchSucceeded.store(true);

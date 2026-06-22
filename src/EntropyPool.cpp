@@ -1,5 +1,6 @@
 #include "plugin.hpp"
 #include "IntegrationsModal.hpp"
+#include <random>
 
 using namespace rack;
 
@@ -42,7 +43,11 @@ struct EntropyPool : Module {
     NUM_LIGHTS
   };
 
+  int valuesSize = 240;
   std::vector<float> values;
+  uint32_t seed = 0;
+  dsp::SchmittTrigger randomButtonTrigger;
+  dsp::SchmittTrigger randomInputTrigger;
 
   EntropyPool() {
     config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
@@ -71,7 +76,25 @@ struct EntropyPool : Module {
   }
 
   void process(const ProcessArgs&) override {
-    // TODO
+    if (
+      randomButtonTrigger.process(params[RANDOM_PARAM].getValue(), 0.1f, 1.f) ||
+      randomInputTrigger.process(inputs[RANDOM_INPUT].getVoltage(), 0.1f, 1.f)
+    ) {
+      std::random_device rd;
+      seed = (uint32_t(rd()) << 16) ^ uint32_t(rd());
+      randomizeValues();
+    }
+  }
+
+  void randomizeValues() {
+    std::mt19937 rng(seed);
+    std::uniform_real_distribution<float> distribution(0.f, 1.f);
+
+    values.clear();
+    values.reserve(valuesSize);
+    for (int i = 0; i < (int)valuesSize; ++i) {
+      values.push_back(distribution(rng));
+    }
   }
 
   json_t* dataToJson() override {
@@ -79,9 +102,10 @@ struct EntropyPool : Module {
 
     json_t* valuesJson = json_array();
     for (auto& value : values) {
-      json_array_append_new(valuesJson, json_integer(value));
+      json_array_append_new(valuesJson, json_real(value));
     }
     json_object_set_new(root, "values", valuesJson);
+    json_object_set_new(root, "seed", json_integer(seed));
 
     return root;
   }
@@ -93,10 +117,16 @@ struct EntropyPool : Module {
         size_t index;
         json_t* valueJson;
         json_array_foreach(valuesJson, index, valueJson) {
-          if (json_is_integer(valueJson)) {
-            values.push_back(json_integer_value(valueJson));
+          if (json_is_number(valueJson)) {
+            values.push_back((float)json_number_value(valueJson));
           }
         }
+      }
+    }
+
+    if (json_t* seedJson = json_object_get(root, "seed")) {
+      if (json_is_integer(seedJson)) {
+        seed = (uint32_t)json_integer_value(seedJson);
       }
     }
   }
@@ -107,34 +137,24 @@ struct EntropyPool : Module {
 struct Grid : Widget {
   EntropyPool* module = nullptr;
   int width = 5;
+  std::mt19937 rng{42u};
+  std::uniform_real_distribution<float> dist{0.f, 1.f};
 
   void draw(const DrawArgs &args) override {
-    if (!module) {
-      // TODO: Draw random sample
-      return;
-    }
-
     try {
-      DEBUG("size: %i", (int)module->values.size());
-      // for (int i = 0; i < (int)module->values.size(); i++) {
-      for (int i = 0; i < 240; i++) {
+      const int size = module ? (int)module->values.size() : module->valuesSize;
+      for (int i = 0; i < size; i++) {
         int x = 1 + (i % 24) * (width + 1);
         int y = 1 + (i / 24) * (width + 1);
-
-        NVGcolor color = nvgRGBA(0, 255, 0, rand() * 200 + 55);
-
-        // TODO: This color formula is not great:
-        //   Github actually uses multiple, quantized colors
-        //   I do need a gradient, but maybe do so with clear cutoffs like them?
-        //   Or, at least pick the right one from their set that works well with alpha
-        //   Also, feels off w/scaling? non-zero but small values are not visible
-        // int value = module->values[i];
-        // NVGcolor color = nvgRGBA(25, 108, 46, value / 10.f * 255.f);
+        float value = module ? module->values[i] : dist(rng);
 
         nvgBeginPath(args.vg);
-        // nvgRect(args.vg, mm2px(x), mm2px(y), mm2px(width), mm2px(width));
         nvgRoundedRect(args.vg, mm2px(x), mm2px(y), mm2px(width), mm2px(width), 3.f);
+
+        // NVGcolor color = nvgRGBA(86, 211, 100, value * 255.f);
+        NVGcolor color = nvgRGBA(46, 160, 67, value * 255.f);
         nvgFillColor(args.vg, color);
+
         nvgFill(args.vg);
 
         if (i == 42) {
@@ -204,7 +224,7 @@ struct EntropyPoolWidget : app::ModuleWidget {
 
     menu->addChild(new ui::MenuSeparator());
     menu->addChild(createMenuItem("Integrations...", "", [=]() {
-      IntegrationsModal* modal = new IntegrationsModal([m](const std::vector<float>& values) {
+      IntegrationsModal* modal = new IntegrationsModal(m->valuesSize, [m](const std::vector<float>& values) {
         m->values = values;
       });
       APP->scene->addChild(modal);

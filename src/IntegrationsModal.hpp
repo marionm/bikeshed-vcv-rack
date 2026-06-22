@@ -66,7 +66,9 @@ struct IntegrationsModal : ui::MenuOverlay {
   ui::Label* statusLabel = nullptr;
   bool wasFetching = false;
 
-  IntegrationsModal(std::function<void(const std::vector<float>&)> onLoaded) : onLoaded(std::move(onLoaded)) {
+  IntegrationsModal(int targetSize, std::function<void(const std::vector<float>&)> onLoaded) : onLoaded(std::move(onLoaded)) {
+    api->targetSize = targetSize;
+
     // Darken the background of the rack
     bgColor = nvgRGBA(0, 0, 0, 160);
 
@@ -89,7 +91,6 @@ struct IntegrationsModal : ui::MenuOverlay {
     modalBox->box.size = Vec(520, 195);
 
     ui::MenuLabel* title = new ui::MenuLabel();
-    // TODO: Better description of private vs public access
     title->text = "Enter GitHub personal access token to use contribution history as sequencer values\nOptionally prefix with <username>@\nUse a classic token with 'repo' and 'read:user' for private contribution data\nNot saved with patch";
     title->box.pos = Vec(16, 20);
     modalBox->addChild(title);
