@@ -47,10 +47,14 @@ struct EntropyPool : Module {
   };
 
   int valuesSize = ENTROPY_POOL_VALUES_SIZE;
+  int currentIndex = 0;
   std::vector<float> values;
   uint32_t seed = 0;
+  dsp::SchmittTrigger clockTrigger;
+  dsp::SchmittTrigger runInputTrigger;
   dsp::SchmittTrigger randomButtonTrigger;
   dsp::SchmittTrigger randomInputTrigger;
+  dsp::PulseGenerator clockLightPulse;
 
   EntropyPool() {
     config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
@@ -75,10 +79,28 @@ struct EntropyPool : Module {
     configOutput(CV_OUTPUT, "CV");
     configOutput(TRIGGER_OUTPUT, "Trigger");
     configOutput(END_OF_SEQUENCE_OUTPUT, "End of sequence");
-
+    randomizeValues();
   }
 
-  void process(const ProcessArgs&) override {
+  int sequenceSize() const {
+    return values.empty() ? valuesSize : (int)values.size();
+  }
+
+  void process(const ProcessArgs& args) override {
+    if (runInputTrigger.process(inputs[RUN_INPUT].getVoltage(), 0.1f, 1.f)) {
+      params[RUN_PARAM].setValue(params[RUN_PARAM].getValue() >= 0.5f ? 0.f : 1.f);
+    }
+
+    bool running = params[RUN_PARAM].getValue() >= 0.5f;
+    lights[RUN_LIGHT].setBrightness(running ? 1.f : 0.f);
+
+    if (running && clockTrigger.process(inputs[CLOCK_INPUT].getVoltage(), 0.1f, 1.f)) {
+      currentIndex = (currentIndex + 1) % sequenceSize();
+      clockLightPulse.trigger(0.05f);
+    }
+
+    lights[CLOCK_LIGHT].setBrightness(clockLightPulse.process(args.sampleTime) ? 1.f : 0.f);
+
     if (
       randomButtonTrigger.process(params[RANDOM_PARAM].getValue(), 0.1f, 1.f) ||
       randomInputTrigger.process(inputs[RANDOM_INPUT].getVoltage(), 0.1f, 1.f)
@@ -98,6 +120,8 @@ struct EntropyPool : Module {
     for (int i = 0; i < (int)valuesSize; ++i) {
       values.push_back(distribution(rng));
     }
+
+    currentIndex %= sequenceSize();
   }
 
   json_t* dataToJson() override {
@@ -109,6 +133,7 @@ struct EntropyPool : Module {
     }
     json_object_set_new(root, "values", valuesJson);
     json_object_set_new(root, "seed", json_integer(seed));
+    json_object_set_new(root, "currentIndex", json_integer(currentIndex));
 
     return root;
   }
@@ -132,6 +157,20 @@ struct EntropyPool : Module {
         seed = (uint32_t)json_integer_value(seedJson);
       }
     }
+
+    if (json_t* currentIndexJson = json_object_get(root, "currentIndex")) {
+      if (json_is_integer(currentIndexJson)) {
+        currentIndex = (int)json_integer_value(currentIndexJson);
+      }
+    }
+
+    int size = sequenceSize();
+    if (size > 0) {
+      currentIndex %= size;
+      if (currentIndex < 0) {
+        currentIndex += size;
+      }
+    }
   }
 };
 
@@ -145,11 +184,11 @@ struct Grid : Widget {
 
   void draw(const DrawArgs &args) override {
     try {
-      const int size = module ? (int)module->values.size() : ENTROPY_POOL_VALUES_SIZE;
+      const int size = module ? module->sequenceSize() : ENTROPY_POOL_VALUES_SIZE;
       for (int i = 0; i < size; i++) {
         int x = 1 + (i % 24) * (width + 1);
         int y = 1 + (i / 24) * (width + 1);
-        float value = module ? module->values[i] : dist(rng);
+        float value = module && i < (int)module->values.size() ? module->values[i] : dist(rng);
 
         nvgBeginPath(args.vg);
         nvgRoundedRect(args.vg, mm2px(x), mm2px(y), mm2px(width), mm2px(width), 3.f);
@@ -160,7 +199,7 @@ struct Grid : Widget {
 
         nvgFill(args.vg);
 
-        if (i == 42) {
+        if (i == (module ? module->currentIndex : 0)) {
           nvgStrokeWidth(args.vg, mm2px(0.5));
           nvgStrokeColor(args.vg, nvgRGB(255, 255, 255));
           nvgStroke(args.vg);
