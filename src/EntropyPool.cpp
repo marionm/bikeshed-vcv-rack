@@ -49,7 +49,7 @@ struct EntropyPool : Module {
   int valuesSize = ENTROPY_POOL_VALUES_SIZE;
   int currentIndex = 0;
   std::vector<float> values;
-  uint32_t seed = 0;
+  uint32_t seed = 42u;
   dsp::SchmittTrigger clockTrigger;
   dsp::SchmittTrigger runInputTrigger;
   dsp::SchmittTrigger resetButtonTrigger;
@@ -81,6 +81,12 @@ struct EntropyPool : Module {
     configOutput(CV_OUTPUT, "CV");
     configOutput(TRIGGER_OUTPUT, "Trigger");
     configOutput(END_OF_SEQUENCE_OUTPUT, "End of sequence");
+    randomizeValues();
+  }
+
+  void onReset() override {
+    seed = 42u;
+    currentIndex = 0;
     randomizeValues();
   }
 
