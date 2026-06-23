@@ -1,4 +1,4 @@
-# Sporkbomb VCV Rack plugin
+# sporkbomb VCV Rack plugin
 
 ## Entropy Pool
 
@@ -19,5 +19,19 @@ The token is *not* saved with patches, but the loaded activity is, so you don't 
 
 ## Setup
 
-1. `git submodule init`
+1. Download the Rack SDK to `../Rack-SDK`
+  * Or, download anywhere and set the `RACK_DIR` environment variable to its path
 2. `make && make install`
+
+## TODO
+
+* Filter
+* Scale
+* Better graphics for active range
+* Direct sequence value modification
+    * Via comma separated values in say the seed input?
+    * Or can i support click/drag or right click modal editing *per* cell?
+* Entropy puddle
+* Github build for all platforms
+* Upgrade to C++... 17? 20? What is safe w/VCVrack publishing?
+* Publish!

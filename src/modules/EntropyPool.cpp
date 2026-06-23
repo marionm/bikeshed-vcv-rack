@@ -1,6 +1,7 @@
-#include "plugin.hpp"
-#include "IntegrationsModal.hpp"
-#include "SeedModal.hpp"
+#include "../components/IntegrationsModal.hpp"
+#include "../components/SeedModal.hpp"
+#include "../plugin.hpp"
+
 #include <random>
 
 using namespace rack;
@@ -83,6 +84,7 @@ struct EntropyPool : Module {
     configOutput(CV_OUTPUT, "CV");
     configOutput(TRIGGER_OUTPUT, "Trigger");
     configOutput(END_OF_SEQUENCE_OUTPUT, "End of sequence");
+
     randomizeValues();
   }
 
