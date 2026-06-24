@@ -4,5 +4,5 @@
 
 using namespace rack;
 
-extern Model* modelEntropyPool;
+extern Model* entropyPoolModel;
 extern Plugin* pluginInstance;

@@ -5,6 +5,7 @@
 
 using namespace rack;
 
+// TODO: Accept comma separated values instead of a seed
 SeedModal::SeedModal(uint32_t seed, std::function<void(uint32_t)> onSave)
   : Modal(360, 130), onSave(std::move(onSave))
 {

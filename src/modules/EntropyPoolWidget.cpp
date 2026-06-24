@@ -1,0 +1,86 @@
+#include "EntropyPool.hpp"
+#include "../components/IntegrationsModal.hpp"
+#include "../components/SeedModal.hpp"
+#include "../widgets/Grid.hpp"
+#include "../plugin.hpp"
+
+#include <rack.hpp>
+
+using namespace rack;
+
+struct EntropyPoolWidget : app::ModuleWidget {
+  EntropyPoolWidget(EntropyPool* module) {
+    setModule(module);
+    setPanel(createPanel(asset::plugin(pluginInstance, "res/EntropyPool.svg")));
+
+    addChild(createWidget<ScrewBlack>(Vec(RACK_GRID_WIDTH, 0)));
+    addChild(createWidget<ScrewBlack>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, 0)));
+    addChild(createWidget<ScrewBlack>(Vec(RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
+    addChild(createWidget<ScrewBlack>(Vec(box.size.x - 2 * RACK_GRID_WIDTH, RACK_GRID_HEIGHT - RACK_GRID_WIDTH)));
+
+    Grid* grid = createWidget<Grid>(mm2px(Vec(6.24, 21.5)));
+    grid->module = module;
+    grid->length = ENTROPY_POOL_LENGTH;
+    grid->mm = 5;
+    grid->setSize(mm2px(Vec(145, 61)));
+    addChild(grid);
+
+    float paramsX = 10.24;
+    float paramsY = 94.5;
+    float paramsDelta = 11;
+    addChild(createLightCentered<MediumLight<GreenLight>>(mm2px(Vec(paramsX + paramsDelta * 0, paramsY)), module, EntropyPool::CLOCK_LIGHT));
+    addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<WhiteLight>>>(mm2px(Vec(paramsX + paramsDelta * 1, paramsY)), module, EntropyPool::RUN_PARAM, EntropyPool::RUN_LIGHT));
+    addParam(createLightParamCentered<VCVLightBezel<WhiteLight>>(mm2px(Vec(paramsX + paramsDelta * 2, paramsY)), module, EntropyPool::RESET_PARAM, EntropyPool::RESET_LIGHT));
+    addParam(createLightParamCentered<VCVLightBezel<WhiteLight>>(mm2px(Vec(paramsX + paramsDelta * 3, paramsY)), module, EntropyPool::RANDOM_PARAM, EntropyPool::RANDOM_LIGHT));
+    addParam(createParamCentered<Trimpot>(mm2px(Vec(paramsX + paramsDelta * 4, paramsY)), module, EntropyPool::START_PARAM));
+    addParam(createParamCentered<Trimpot>(mm2px(Vec(paramsX + paramsDelta * 5, paramsY)), module, EntropyPool::LENGTH_PARAM));
+    addParam(createParamCentered<Trimpot>(mm2px(Vec(paramsX + paramsDelta * 6, paramsY)), module, EntropyPool::FILTER_PARAM));
+    addParam(createParamCentered<Trimpot>(mm2px(Vec(paramsX + paramsDelta * 7, paramsY)), module, EntropyPool::SCALE_PARAM));
+
+    float inputsX = 10.24;
+    float inputsY = 116.5;
+    float inputsDelta = 11;
+    addInput(createInputCentered<DarkPJ301MPort>(mm2px(Vec(inputsX + inputsDelta * 0, inputsY)), module, EntropyPool::CLOCK_INPUT));
+    addInput(createInputCentered<DarkPJ301MPort>(mm2px(Vec(inputsX + inputsDelta * 1, inputsY)), module, EntropyPool::RUN_INPUT));
+    addInput(createInputCentered<DarkPJ301MPort>(mm2px(Vec(inputsX + inputsDelta * 2, inputsY)), module, EntropyPool::RESET_INPUT));
+    addInput(createInputCentered<DarkPJ301MPort>(mm2px(Vec(inputsX + inputsDelta * 3, inputsY)), module, EntropyPool::RANDOM_INPUT));
+    addInput(createInputCentered<DarkPJ301MPort>(mm2px(Vec(inputsX + inputsDelta * 4, inputsY)), module, EntropyPool::START_INPUT));
+    addInput(createInputCentered<DarkPJ301MPort>(mm2px(Vec(inputsX + inputsDelta * 5, inputsY)), module, EntropyPool::LENGTH_INPUT));
+    addInput(createInputCentered<DarkPJ301MPort>(mm2px(Vec(inputsX + inputsDelta * 6, inputsY)), module, EntropyPool::FILTER_INPUT));
+    addInput(createInputCentered<DarkPJ301MPort>(mm2px(Vec(inputsX + inputsDelta * 7, inputsY)), module, EntropyPool::SCALE_INPUT));
+
+    float outputsX = 122.24;
+    float outputsY = 116.5;
+    float outputsDelta = 11;
+    addOutput(createOutputCentered<DarkPJ301MPort>(mm2px(Vec(outputsX + outputsDelta * 0, outputsY)), module, EntropyPool::CV_OUTPUT));
+    addOutput(createOutputCentered<DarkPJ301MPort>(mm2px(Vec(outputsX + outputsDelta * 1, outputsY)), module, EntropyPool::TRIGGER_OUTPUT));
+    addOutput(createOutputCentered<DarkPJ301MPort>(mm2px(Vec(outputsX + outputsDelta * 2, outputsY)), module, EntropyPool::EOS_OUTPUT));
+  }
+
+  void appendContextMenu(ui::Menu* menu) override {
+    ModuleWidget::appendContextMenu(menu);
+
+    EntropyPool* m = getModule<EntropyPool>();
+    if (!m) return;
+
+    menu->addChild(new ui::MenuSeparator());
+
+    menu->addChild(createMenuItem("Seed...", "", [=]() {
+      SeedModal* modal = new SeedModal(m->seed, [m](uint32_t seed) {
+        m->seed = seed;
+        m->randomizeValues();
+      });
+      APP->scene->addChild(modal);
+    }));
+
+    menu->addChild(createMenuItem("Integrations...", "", [=]() {
+      IntegrationsModal* modal = new IntegrationsModal(m->length, [m](const std::vector<float>& values) {
+        m->values = values;
+      });
+      APP->scene->addChild(modal);
+    }));
+  }
+
+};
+
+Model* entropyPoolModel = createModel<EntropyPool, EntropyPoolWidget>("EntropyPool");
