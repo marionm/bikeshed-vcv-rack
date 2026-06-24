@@ -1,6 +1,6 @@
 #include "EntropyBase.hpp"
 
-static constexpr int ENTROPY_PUDDLE_LENGTH = 100;
+static constexpr int ENTROPY_PUDDLE_LENGTH = 96;
 
 struct EntropyPuddle : EntropyBase {
   enum ParamId {
