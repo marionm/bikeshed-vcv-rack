@@ -9,26 +9,36 @@ const float gutterWidth = 1;
 const float borderWidth = gutterWidth / 2;
 const float capWidth = gutterWidth / 2;
 const float capRadius = 3.f + mm2px(.5f); 
-// const NVGcolor borderColor = nvgRGB(96, 96, 96);
+const NVGcolor borderColor = nvgRGB(96, 96, 96);
 const NVGcolor capColor = nvgRGB(240, 246, 253);
 const NVGcolor dotColor = nvgRGB(240, 246, 253);
 
 // TODO: Render tooltips by calculating index from mouse position?
 void Grid::draw(const DrawArgs& args) {
   for (int i = 0; i < length; i++) {
-    const int x = gutterWidth + (i % rowLength) * (mm + gutterWidth);
-    const int y = gutterWidth + (i / rowLength) * (mm + gutterWidth);
-    const float value = module ? module->values[i] : defaultDistribution(defaultRng);
-    const bool isInRange = module ? module -> isInRange(i) : true;
+    float value = module ? module->values[i] : defaultDistribution(defaultRng);
+    bool isFiltered = module ? value < module->minValue : false;
+    bool isInRange = module ? module -> isInRange(i) : true;
 
     const NVGcolor color = isInRange
       ? nvgRGBA(46, 160, 67, value * 255.f)
       : nvgRGBA(96, 96, 96, value * 255.f);
 
-    nvgBeginPath(args.vg);
-    nvgRoundedRect(args.vg, mm2px(x), mm2px(y), mm2px(mm), mm2px(mm), rectRadius);
-    nvgFillColor(args.vg, color);
-    nvgFill(args.vg);
+    const int x = gutterWidth + (i % rowLength) * (mm + gutterWidth);
+    const int y = gutterWidth + (i / rowLength) * (mm + gutterWidth);
+
+    if (isFiltered) {
+      nvgBeginPath(args.vg);
+      nvgRoundedRect(args.vg, mm2px(x + .2f), mm2px(y + .2f), mm2px(mm - .4f), mm2px(mm - .4f), rectRadius);
+      nvgStrokeColor(args.vg, color);
+      nvgStrokeWidth(args.vg, mm2px(.4f));
+      nvgStroke(args.vg);
+    } else {
+      nvgBeginPath(args.vg);
+      nvgRoundedRect(args.vg, mm2px(x), mm2px(y), mm2px(mm), mm2px(mm), rectRadius);
+      nvgFillColor(args.vg, color);
+      nvgFill(args.vg);
+    }
 
     if (!module || !isInRange) {
       continue;

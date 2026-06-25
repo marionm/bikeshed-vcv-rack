@@ -10,6 +10,7 @@ struct EntropyBase : rack::Module {
   int minIndex = 0;
   int index = 0;
   int maxIndex = 0; // max is somehat misleading, as it can wrap
+  float minValue = 0;
 
   struct ParamIds {
     int run, reset, random, start, length, filter;
@@ -54,9 +55,14 @@ private:
   rack::dsp::PulseGenerator clockLightPulse;
 
   void onReset() override;
+
   void process(const ProcessArgs& args) override;
+  void updateFilter();
   void updateRange();
-  void incrementIndex();
+  void updateRun();
+  void updateValues();
+  void updateIndex(const ProcessArgs& args);
+
   static float clamp01(float value);
   json_t* dataToJson() override;
   void dataFromJson(json_t* root) override;
