@@ -9,10 +9,13 @@ struct EntropyBase : rack::Module {
     RUN_PARAM,
     RESET_PARAM,
     RANDOM_PARAM,
-    START_PARAM,
-    LENGTH_PARAM,
-    FILTER_PARAM,
     SCALE_PARAM,
+    START_PARAM,
+    START_CV_PARAM,
+    LENGTH_PARAM,
+    LENGTH_CV_PARAM,
+    FILTER_PARAM,
+    FILTER_CV_PARAM,
     NUM_PARAMS
   };
 
@@ -24,14 +27,13 @@ struct EntropyBase : rack::Module {
     START_INPUT,
     LENGTH_INPUT,
     FILTER_INPUT,
-    SCALE_INPUT,
     NUM_INPUTS
   };
 
   enum OutputId {
-    CV_OUTPUT,
-    TRIGGER_OUTPUT,
     EOS_OUTPUT,
+    TRIGGER_OUTPUT,
+    CV_OUTPUT,
     NUM_OUTPUTS
   };
 
@@ -40,6 +42,8 @@ struct EntropyBase : rack::Module {
     RUN_LIGHT,
     RESET_LIGHT,
     RANDOM_LIGHT,
+    EOS_LIGHT,
+    TRIGGER_LIGHT,
     NUM_LIGHTS
   };
 

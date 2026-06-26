@@ -27,7 +27,6 @@ EntropyBase::EntropyBase(int length) : length(length) {
   configInput(LENGTH_INPUT, "Sequence length");
   configParam(LENGTH_PARAM, 0.f, 1.f, 1.f, "Sequence length");
 
-  configInput(SCALE_INPUT, "Scale");
   configParam(SCALE_PARAM, 0.f, 1.f, 0.f, "Scale");
 
   configOutput(CV_OUTPUT, "CV");

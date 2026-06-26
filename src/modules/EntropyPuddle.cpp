@@ -11,8 +11,8 @@ struct EntropyPuddle : EntropyBase {
 };
 
 struct EntropyPuddleWidget : EntropyBaseWidget {
-  EntropyPuddleWidget(EntropyPuddle* module) : EntropyBaseWidget(module, "res/EntropyPuddle.svg") {
-    Grid* grid = createWidget<Grid>(mm2px(Vec(4.14, 22)));
+  EntropyPuddleWidget(EntropyPuddle* module) : EntropyBaseWidget(module, "res/EntropyPuddle2.svg") {
+    Grid* grid = createWidget<Grid>(mm2px(Vec(4.14, 6.24)));
     grid->setSize(mm2px(Vec(73, 49)));
     grid->module = module;
     grid->length = ENTROPY_PUDDLE_LENGTH;
@@ -20,34 +20,41 @@ struct EntropyPuddleWidget : EntropyBaseWidget {
     grid->mm = 5;
     addChild(grid);
 
-    float paramsX = 7.64;
-    float paramsY = 78;
-    float paramsDelta = 11;
-    addChild(createLightCentered<MediumLight<GreenLight>>(mm2px(Vec(paramsX + paramsDelta * 0, paramsY)), module, EntropyPuddle::CLOCK_LIGHT));
-    addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<WhiteLight>>>(mm2px(Vec(paramsX + paramsDelta * 1, paramsY)), module, EntropyPuddle::RUN_PARAM, EntropyPuddle::RUN_LIGHT));
-    addParam(createLightParamCentered<VCVLightBezel<WhiteLight>>(mm2px(Vec(paramsX + paramsDelta * 2, paramsY)), module, EntropyPuddle::RESET_PARAM, EntropyPuddle::RESET_LIGHT));
-    addParam(createLightParamCentered<VCVLightBezel<WhiteLight>>(mm2px(Vec(paramsX + paramsDelta * 3, paramsY)), module, EntropyPuddle::RANDOM_PARAM, EntropyPuddle::RANDOM_LIGHT));
-    addParam(createParamCentered<Trimpot>(mm2px(Vec(paramsX + paramsDelta * 4, paramsY)), module, EntropyPuddle::START_PARAM));
-    addParam(createParamCentered<Trimpot>(mm2px(Vec(paramsX + paramsDelta * 5, paramsY)), module, EntropyPuddle::LENGTH_PARAM));
-    addParam(createParamCentered<Trimpot>(mm2px(Vec(paramsX + paramsDelta * 6, paramsY)), module, EntropyPuddle::FILTER_PARAM));
+    float x = 24.64;
+    float y = 72.76;
+    float d = 16;
+    addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(x + d * 0, y)), module, EntropyPuddle::START_PARAM));
+    addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(x + d * 1, y)), module, EntropyPuddle::FILTER_PARAM));
+    addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(x + d * 2, y)), module, EntropyPuddle::LENGTH_PARAM));
 
-    float inputsX = 7.64;
-    float inputsY = 100;
-    float inputsDelta = 11;
-    addInput(createInputCentered<DarkPJ301MPort>(mm2px(Vec(inputsX + inputsDelta * 0, inputsY)), module, EntropyPuddle::CLOCK_INPUT));
-    addInput(createInputCentered<DarkPJ301MPort>(mm2px(Vec(inputsX + inputsDelta * 1, inputsY)), module, EntropyPuddle::RUN_INPUT));
-    addInput(createInputCentered<DarkPJ301MPort>(mm2px(Vec(inputsX + inputsDelta * 2, inputsY)), module, EntropyPuddle::RESET_INPUT));
-    addInput(createInputCentered<DarkPJ301MPort>(mm2px(Vec(inputsX + inputsDelta * 3, inputsY)), module, EntropyPuddle::RANDOM_INPUT));
-    addInput(createInputCentered<DarkPJ301MPort>(mm2px(Vec(inputsX + inputsDelta * 4, inputsY)), module, EntropyPuddle::START_INPUT));
-    addInput(createInputCentered<DarkPJ301MPort>(mm2px(Vec(inputsX + inputsDelta * 5, inputsY)), module, EntropyPuddle::LENGTH_INPUT));
-    addInput(createInputCentered<DarkPJ301MPort>(mm2px(Vec(inputsX + inputsDelta * 6, inputsY)), module, EntropyPuddle::FILTER_INPUT));
+    x = 7.64;
+    y = 86.76;
+    d = 11;
+    addChild(createLightCentered<MediumLight<GreenLight>>(mm2px(Vec(x + d * 0, y)), module, EntropyPuddle::CLOCK_LIGHT));
+    addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<WhiteLight>>>(mm2px(Vec(x + d * 1, y)), module, EntropyPuddle::RUN_PARAM, EntropyPuddle::RUN_LIGHT));
+    addParam(createParamCentered<Trimpot>(mm2px(Vec(x + d * 2, y)), module, EntropyPuddle::START_PARAM));
+    addParam(createParamCentered<Trimpot>(mm2px(Vec(x + d * 3, y)), module, EntropyPuddle::FILTER_PARAM));
+    addParam(createParamCentered<Trimpot>(mm2px(Vec(x + d * 4, y)), module, EntropyPuddle::LENGTH_PARAM));
+    addParam(createLightParamCentered<VCVLightBezel<WhiteLight>>(mm2px(Vec(x + d * 5, y)), module, EntropyPuddle::RANDOM_PARAM, EntropyPuddle::RANDOM_LIGHT));
+    addParam(createLightParamCentered<VCVLightBezel<WhiteLight>>(mm2px(Vec(x + d * 6, y)), module, EntropyPuddle::RESET_PARAM, EntropyPuddle::RESET_LIGHT));
 
-    float outputsX = 24.14;
-    float outputsY = 114;
-    float outputsDelta = 22;
-    addOutput(createOutputCentered<DarkPJ301MPort>(mm2px(Vec(outputsX + outputsDelta * 0, outputsY)), module, EntropyPuddle::CV_OUTPUT));
-    addOutput(createOutputCentered<DarkPJ301MPort>(mm2px(Vec(outputsX + outputsDelta * 1, outputsY)), module, EntropyPuddle::TRIGGER_OUTPUT));
-    addOutput(createOutputCentered<DarkPJ301MPort>(mm2px(Vec(outputsX + outputsDelta * 2, outputsY)), module, EntropyPuddle::EOS_OUTPUT));
+    x = 7.64;
+    y = 104.76;
+    d = 11;
+    addInput(createInputCentered<DarkPJ301MPort>(mm2px(Vec(x + d * 0, y)), module, EntropyPuddle::CLOCK_INPUT));
+    addInput(createInputCentered<DarkPJ301MPort>(mm2px(Vec(x + d * 1, y)), module, EntropyPuddle::RUN_INPUT));
+    addInput(createInputCentered<DarkPJ301MPort>(mm2px(Vec(x + d * 2, y)), module, EntropyPuddle::START_INPUT));
+    addInput(createInputCentered<DarkPJ301MPort>(mm2px(Vec(x + d * 3, y)), module, EntropyPuddle::FILTER_INPUT));
+    addInput(createInputCentered<DarkPJ301MPort>(mm2px(Vec(x + d * 4, y)), module, EntropyPuddle::LENGTH_INPUT));
+    addInput(createInputCentered<DarkPJ301MPort>(mm2px(Vec(x + d * 5, y)), module, EntropyPuddle::RANDOM_INPUT));
+    addInput(createInputCentered<DarkPJ301MPort>(mm2px(Vec(x + d * 6, y)), module, EntropyPuddle::RESET_INPUT));
+
+    y = 118.26;
+    addOutput(createOutputCentered<DarkPJ301MPort>(mm2px(Vec(18.64, y)), module, EntropyPuddle::EOS_OUTPUT));
+    addOutput(createOutputCentered<DarkPJ301MPort>(mm2px(Vec(40.64, y)), module, EntropyPuddle::TRIGGER_OUTPUT));
+    addOutput(createOutputCentered<DarkPJ301MPort>(mm2px(Vec(73.64, y)), module, EntropyPuddle::CV_OUTPUT));
+
+    addParam(createParamCentered<Trimpot>(mm2px(Vec(57.14, y)), module, EntropyPuddle::SCALE_PARAM));
   }
 };
 
