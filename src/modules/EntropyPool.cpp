@@ -23,7 +23,7 @@ struct EntropyPoolWidget : EntropyBaseWidget {
     addChild(grid);
 
     float x = 62.74;
-    float y = 80.5;
+    float y = 82;
     float d = 16;
     addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(x + d * 0, y)), module, EntropyPool::START_PARAM));
     addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(x + d * 1, y)), module, EntropyPool::FILTER_PARAM));
@@ -31,7 +31,6 @@ struct EntropyPoolWidget : EntropyBaseWidget {
 
     x = 10.24;
     y = 94.5;
-    // y = 96.859; // Lines up with many VCV plugins
     d = 11;
     addChild(createLightCentered<MediumLight<GreenLight>>(mm2px(Vec(x + d * 0, y)), module, EntropyPool::CLOCK_LIGHT));
     addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<WhiteLight>>>(mm2px(Vec(x + d * 1, y)), module, EntropyPool::RUN_PARAM, EntropyPool::RUN_LIGHT));
@@ -43,11 +42,12 @@ struct EntropyPoolWidget : EntropyBaseWidget {
     addParam(createParamCentered<Trimpot>(mm2px(Vec(x + d * 1, y)), module, EntropyPool::FILTER_CV_PARAM));
     addParam(createParamCentered<Trimpot>(mm2px(Vec(x + d * 2, y)), module, EntropyPool::LENGTH_CV_PARAM));
 
-    x = 147.24;
-    addParam(createParamCentered<Trimpot>(mm2px(Vec(x + d * 0, y)), module, EntropyPool::SCALE_PARAM));
+    x = 125.24;
+    addChild(createLightCentered<MediumLight<GreenLight>>(mm2px(Vec(x + d * 0, y)), module, EntropyPool::EOS_LIGHT));
+    addChild(createLightCentered<MediumLight<GreenLight>>(mm2px(Vec(x + d * 1, y)), module, EntropyPool::TRIGGER_LIGHT));
+    addParam(createParamCentered<Trimpot>(mm2px(Vec(x + d * 2, y)), module, EntropyPool::SCALE_PARAM));
 
     x = 10.24;
-    // y = 116.5;
     y = 113.115; // Lines up with many VCV plugins
     d = 11;
     addInput(createInputCentered<DarkPJ301MPort>(mm2px(Vec(x + d * 0, y)), module, EntropyPool::CLOCK_INPUT));
