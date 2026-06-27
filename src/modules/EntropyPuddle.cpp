@@ -52,12 +52,13 @@ struct EntropyPuddleWidget : EntropyBaseWidget {
     addInput(createInputCentered<DarkPJ301MPort>(mm2px(Vec(x + d * 5, y)), module, EntropyPuddle::RESET_INPUT));
     addInput(createInputCentered<DarkPJ301MPort>(mm2px(Vec(x + d * 6, y)), module, EntropyPuddle::RANDOM_INPUT));
 
-    x = 29.64;
+    x = 18.64;
     y = 113.115; // Lines up with many VCV plugins
     addOutput(createOutputCentered<DarkPJ301MPort>(mm2px(Vec(x + d * 0, y)), module, EntropyPuddle::EOS_OUTPUT));
     addOutput(createOutputCentered<DarkPJ301MPort>(mm2px(Vec(x + d * 1, y)), module, EntropyPuddle::TRIGGER_OUTPUT));
-    addOutput(createOutputCentered<DarkPJ301MPort>(mm2px(Vec(x + d * 2, y)), module, EntropyPuddle::CV_OUTPUT));
-    addParam(createParamCentered<Trimpot>(mm2px(Vec(x + d * 3, y)), module, EntropyPuddle::SCALE_PARAM));
+    addOutput(createOutputCentered<DarkPJ301MPort>(mm2px(Vec(x + d * 2, y)), module, EntropyPuddle::GATE_OUTPUT));
+    addOutput(createOutputCentered<DarkPJ301MPort>(mm2px(Vec(x + d * 3, y)), module, EntropyPuddle::CV_OUTPUT));
+    addParam(createParamCentered<Trimpot>(mm2px(Vec(x + d * 4, y)), module, EntropyPuddle::SCALE_PARAM));
   }
 };
 

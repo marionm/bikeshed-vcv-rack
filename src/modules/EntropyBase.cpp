@@ -47,9 +47,8 @@ EntropyBase::EntropyBase(int totalLength) : totalLength(totalLength) {
   getParamQuantity(LENGTH_CV_PARAM)->randomizeEnabled = false;
 
   configOutput(EOS_OUTPUT, "End of sequence");
-
   configOutput(TRIGGER_OUTPUT, "Trigger");
-
+  configOutput(GATE_OUTPUT, "Gate");
   configOutput(CV_OUTPUT, "CV");
 
   configParam(SCALE_PARAM, -1.f, 1.f, .1f, "Scale");
@@ -76,11 +75,14 @@ void EntropyBase::onReset() {
 
 void EntropyBase::process(const ProcessArgs& args) {
   updateFilter();
-  updateRun();
+  bool isRunning = updateRun();
   updateValues(args);
 
   bool isReversed = updateRange();
-  updateIndex(args, isReversed);
+  bool didStep = updateIndex(args, isRunning, isReversed);
+
+  float value = getValue();
+  updateGateOutput(args, value, didStep);
 }
 
 void EntropyBase::updateFilter() {
@@ -130,13 +132,15 @@ bool EntropyBase::updateRange() {
   return isReversed;
 }
 
-void EntropyBase::updateRun() {
+bool EntropyBase::updateRun() {
   if (runTrigger.process(inputs[RUN_INPUT].getVoltage())) {
     params[RUN_PARAM].setValue(params[RUN_PARAM].getValue() >= 0.5f ? 0.f : 1.f);
   }
 
-  bool running = params[RUN_PARAM].getValue() >= 0.5f;
-  lights[RUN_LIGHT].setBrightness(running ? 1.f : 0.f);
+  bool isRunning = params[RUN_PARAM].getValue() >= 0.5f;
+  lights[RUN_LIGHT].setBrightness(isRunning ? 1.f : 0.f);
+
+  return isRunning;
 }
 
 void EntropyBase::updateValues(const ProcessArgs& args) {
@@ -153,11 +157,10 @@ void EntropyBase::updateValues(const ProcessArgs& args) {
   pulseLight(args, randomPulse, RANDOM_LIGHT, didRandomize);
 }
 
-void EntropyBase::updateIndex(const ProcessArgs& args, bool isReversed) {
+bool EntropyBase::updateIndex(const ProcessArgs& args, bool isRunning, bool isReversed) {
   bool didStep = false;
   bool hitEos = false;
-  bool running = params[RUN_PARAM].getValue() >= 0.5f;
-  if (running && (
+  if (isRunning && (
     clockButtonTrigger.process(params[CLOCK_PARAM].getValue()) ||
     clockTrigger.process(inputs[CLOCK_INPUT].getVoltage())
   )) {
@@ -179,8 +182,48 @@ void EntropyBase::updateIndex(const ProcessArgs& args, bool isReversed) {
   }
 
   pulseLight(args, resetPulse, RESET_LIGHT, didReset);
+
+  return didStep;
 }
 
+void EntropyBase::updateGateOutput(const ProcessArgs& args, float value, bool didStep) {
+  timeSinceLastClock += args.sampleTime;
+
+  if (isGateActive) {
+    gateTime += args.sampleTime;
+    if (gateTime >= maxGateTime) {
+      isGateActive = false;
+    }
+  }
+
+  if (didStep) {
+    // Can't output gates until we have at least one clock trigger for duration calculations
+    if (hasStepped) {
+      gateTime = 0.f;
+      maxGateTime = timeSinceLastClock * value;
+      isGateActive = maxGateTime > 0.f;
+    } else {
+      hasStepped = true;
+    }
+
+    timeSinceLastClock = 0.f;
+  }
+
+  pulseLight(args, gatePulse, GATE_LIGHT, isGateActive);
+  outputs[GATE_OUTPUT].setVoltage(isGateActive ? 10.f : 0.f);
+}
+
+float EntropyBase::getValue() {
+  float value = values[index];
+
+  if (minValue <= value && value <= maxValue) {
+    return value;
+  } else {
+    return 0;
+  }
+}
+
+// TODO: Extract a generic helpers module
 void EntropyBase::pulseLight(const ProcessArgs& args, dsp::PulseGenerator& pulse, int lightId, bool on) {
   if (on) {
     pulse.trigger(1e-3f);

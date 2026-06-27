@@ -34,6 +34,7 @@ struct EntropyBase : rack::Module {
   enum OutputId {
     EOS_OUTPUT,
     TRIGGER_OUTPUT,
+    GATE_OUTPUT,
     CV_OUTPUT,
     NUM_OUTPUTS
   };
@@ -45,6 +46,7 @@ struct EntropyBase : rack::Module {
     RANDOM_LIGHT,
     EOS_LIGHT,
     TRIGGER_LIGHT,
+    GATE_LIGHT,
     NUM_LIGHTS
   };
 
@@ -81,16 +83,27 @@ private:
 
   rack::dsp::PulseGenerator eosPulse;
   rack::dsp::PulseGenerator triggerPulse;
+  rack::dsp::PulseGenerator gatePulse;
 
   void onRandomize() override;
   void onReset() override;
 
   void process(const ProcessArgs& args) override;
   void updateFilter();
-  void updateRun();
+  bool updateRun();
   void updateValues(const ProcessArgs& args);
   bool updateRange();
-  void updateIndex(const ProcessArgs& args, bool isReversed);
+  bool updateIndex(const ProcessArgs& args, bool isRunning, bool isReversed);
+
+  float timeSinceLastClock = 0.f;
+  bool hasStepped = false;
+  bool isGateActive = false;
+  float gateTime = 0.f;
+  float maxGateTime = 0.f;
+  void updateGateOutput(const ProcessArgs& args, float value, bool didStep);
+
+  float getValue();
+
   void pulseLight(const ProcessArgs& args, rack::dsp::PulseGenerator& pulse, int lightId, bool on);
 
   static float clamp01(float value);
