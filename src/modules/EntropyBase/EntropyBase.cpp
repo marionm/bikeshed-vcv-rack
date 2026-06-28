@@ -246,7 +246,7 @@ float EntropyBase::getValue() {
 }
 
 float EntropyBase::scaleValue(float value) {
-  float scale = params[SCALE_PARAM].getValue();
+  float scale = params[SCALE_PARAM].getValue() * 10.f;
   if (scale >= 0) {
     return value * scale;
   } else {
