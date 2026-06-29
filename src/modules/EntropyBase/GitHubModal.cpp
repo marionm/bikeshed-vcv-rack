@@ -1,14 +1,14 @@
-#include "IntegrationsModal.hpp"
+#include "GitHubModal.hpp"
 
 using namespace rack;
 
-IntegrationsModal::IntegrationsModal(int targetSize, std::function<void(const std::vector<float>&)> onLoaded)
+GitHubModal::GitHubModal(int targetSize, std::function<void(const std::vector<float>&)> onLoaded)
   : Modal(580, 180), onLoaded(std::move(onLoaded))
 {
   api->targetSize = targetSize;
 
   struct SaveButton : ui::Button {
-    IntegrationsModal* modal = nullptr;
+    GitHubModal* modal = nullptr;
     void onAction(const event::Action& e) override {
       if (modal->api->refreshStatus.load() != GitHubIntegration::RefreshStatus::InProgress) {
         modal->api->includeWeekends = modal->weekendsCheckbox->value;
@@ -18,7 +18,7 @@ IntegrationsModal::IntegrationsModal(int targetSize, std::function<void(const st
   };
 
   struct CancelButton : ui::Button {
-    IntegrationsModal* modal = nullptr;
+    GitHubModal* modal = nullptr;
     void onAction(const event::Action& e) override {
       modal->requestDelete();
     }
@@ -68,7 +68,7 @@ IntegrationsModal::IntegrationsModal(int targetSize, std::function<void(const st
   modal->addChild(cancelButton);
 }
 
-void IntegrationsModal::step() {
+void GitHubModal::step() {
   Modal::step();
 
   GitHubIntegration::RefreshStatus status = api->refreshStatus.load();

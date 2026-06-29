@@ -35,7 +35,7 @@ The token is *not* saved with patches, but the loaded activity is, so you don't 
     * ports?
         * no, but maybe a custom widget anyway to include output indicator border
 * input/output modal with raw values string (comma separated)
-* value tooltips on mouse hover in grid?
+    * replace seed
 * Can i support click/drag or right click modal editing *per* cell?
 * Github build for all platforms
 * Upgrade to C++... 17? 20? What is safe w/VCVrack publishing?

@@ -11,8 +11,8 @@
 #include <memory>
 #include <vector>
 
-struct IntegrationsModal : Modal {
-  IntegrationsModal(int targetSize, std::function<void(const std::vector<float>&)> onLoaded);
+struct GitHubModal : Modal {
+  GitHubModal(int targetSize, std::function<void(const std::vector<float>&)> onLoaded);
   void step() override;
 
 private:
