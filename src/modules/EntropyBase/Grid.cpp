@@ -13,7 +13,11 @@ const NVGcolor borderColor = nvgRGB(96, 96, 96);
 const NVGcolor capColor = nvgRGB(240, 246, 253);
 const NVGcolor dotColor = nvgRGB(240, 246, 253);
 
-// TODO: Render tooltips by calculating index from mouse position?
+Grid::Grid() : tooltip(new ui::Tooltip()) {
+  tooltip->visible = false;
+  APP->scene->addChild(tooltip);
+}
+
 void Grid::draw(const DrawArgs& args) {
   for (int i = 0; i < length; i++) {
     float value = module ? module->values[i] : defaultDistribution(defaultRng);
@@ -120,4 +124,29 @@ void Grid::draw(const DrawArgs& args) {
       nvgFill(args.vg);
     }
   }
+}
+
+void Grid::onEnter(const EnterEvent& event) {
+  OpaqueWidget::onEnter(event);
+
+  tooltip->visible = true;
+}
+
+void Grid::onHover(const HoverEvent& event) {
+  OpaqueWidget::onHover(event);
+
+  int x = event.pos.x / box.getWidth() * rowLength;
+  int y = event.pos.y / box.getHeight() * ((float)length / rowLength);
+  int i = y * rowLength + x;
+  if (i >= 0 && (size_t)i < module->values.size()) {
+    tooltip->text = string::f("%.2f", module->values[i]);
+  } else {
+    tooltip->text = "";
+  }
+}
+
+void Grid::onLeave(const LeaveEvent& event) {
+  OpaqueWidget::onLeave(event);
+
+  tooltip->visible = false;
 }

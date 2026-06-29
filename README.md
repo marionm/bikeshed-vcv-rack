@@ -25,14 +25,22 @@ The token is *not* saved with patches, but the loaded activity is, so you don't 
 
 ## TODO
 
-* int snaps for start/len
+* custom controls
+    * knobs, both sizes
+        * draw arcs in nanovg, should make design easier
+    * toggle button
+        * match size of small knobs - with or without arcs?
+    * light button
+        * match size of small knobs - with or without arcs?
+    * ports?
+        * no, but maybe a custom widget anyway to include output indicator border
 * input/output modal with raw values string (comma separated)
 * value tooltips on mouse hover in grid?
 * Can i support click/drag or right click modal editing *per* cell?
-* custom knob svgs?
 * Github build for all platforms
 * Upgrade to C++... 17? 20? What is safe w/VCVrack publishing?
 * vcv manual
 * better plugin/author/repo name
+    * include plugin name at top of svg? what about a logo?
 * Update readme with more info
 * Publish!

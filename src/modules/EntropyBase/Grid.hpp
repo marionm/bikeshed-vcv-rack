@@ -6,7 +6,10 @@
 
 #include <random>
 
-struct Grid : rack::Widget {
+struct Grid : rack::OpaqueWidget {
+  Grid();
+
+  rack::ui::Tooltip* tooltip;
   int length, rowLength, itemWidth;
 
   // Will be null in previews - use default rng to generate a preview grid
@@ -15,5 +18,8 @@ struct Grid : rack::Widget {
   std::uniform_real_distribution<float> defaultDistribution{0.f, 1.f};
 
   void draw(const DrawArgs &args) override;
+  void onEnter(const EnterEvent& event) override;
+  void onHover(const HoverEvent& event) override;
+  void onLeave(const LeaveEvent& event) override;
 };
 
