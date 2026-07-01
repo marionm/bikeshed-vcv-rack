@@ -1,5 +1,6 @@
 #include "GitHubIntegration.hpp"
 #include "GitHubModal.hpp"
+#include "TextFieldContainer.hpp"
 
 #include <chrono>
 #include <string>
@@ -25,7 +26,7 @@ GitHubModal::GitHubModal(EntropyBase* module)
   tokenField = new GitHubTokenField();
   tokenField->box.pos = Vec(14, 79);
   tokenField->box.size = Vec(360, 21);
-  addChild(tokenField);
+  addChild(TextFieldContainer::wrap(tokenField));
 
   weekendsCheckbox = new Checkbox();
   weekendsCheckbox->box.pos = Vec(15, 104);

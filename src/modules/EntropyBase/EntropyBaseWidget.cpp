@@ -1,6 +1,7 @@
 #include "EntropyBaseWidget.hpp"
 #include "GitHubModal.hpp"
 #include "SeedModal.hpp"
+#include "ValuesModal.hpp"
 
 #include "../../plugin.hpp"
 
@@ -25,6 +26,10 @@ void EntropyBaseWidget::appendContextMenu(ui::Menu* menu) {
   }
 
   menu->addChild(new ui::MenuSeparator());
+
+  menu->addChild(createMenuItem("Values...", "", [=]() {
+    new ValuesModal(module);
+  }));
 
   menu->addChild(createMenuItem("Seed...", "", [=]() {
     new SeedModal(module);

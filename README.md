@@ -25,21 +25,17 @@ The token is *not* saved with patches, but the loaded activity is, so you don't 
 
 ## TODO
 
-* custom controls
-    * knobs, both sizes
-        * draw arcs in nanovg, should make design easier
-    * toggle button
-        * match size of small knobs - with or without arcs?
-    * light button
-        * match size of small knobs - with or without arcs?
-    * ports?
-        * no, but maybe a custom widget anyway to include output indicator border
-* input/output modal with raw values string (comma separated)
-    * keep seed separate - make sure that you can open and just hit "save" to make it reset any manual edits
+* Custom controls
+    * Knobs, both sizes
+        * Draw arcs in nanovg, should make design easier
+    * Toggle button
+        * Match size of small knobs - with or without arcs?
+    * Light button
+        * Match size of small knobs - with or without arcs?
+    * Ports?
+        * No, but maybe a custom widget anyway to include output indicator border
 * Github build for all platforms
-* Upgrade to C++... 17? 20? What is safe w/VCVrack publishing?
-* manual
-* better plugin/author/repo name
-    * include plugin name at top of svg? what about a logo?
-* Update readme with more info
-* Publish!
+* Manual
+* Readme
+* Plugin name, config
+* Publish
