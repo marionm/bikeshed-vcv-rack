@@ -9,8 +9,9 @@ static constexpr int ENTROPY_PUDDLE_ROW_LENGTH = 12;
 static constexpr int ENTROPY_PUDDLE_GRID_ITEM_WIDTH = 5;
 
 struct EntropyPuddle : EntropyBase {
-  EntropyPuddle() : EntropyBase(ENTROPY_PUDDLE_LENGTH) {
-  }
+  EntropyPuddle()
+    : EntropyBase(ENTROPY_PUDDLE_LENGTH)
+  {}
 };
 
 struct EntropyPuddleWidget : EntropyBaseWidget {

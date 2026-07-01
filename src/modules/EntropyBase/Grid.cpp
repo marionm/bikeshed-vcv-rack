@@ -7,16 +7,20 @@
 
 using namespace rack;
 
-const float rectRadius = 3.f;
-const float gutterWidth = 1;
-const float borderWidth = gutterWidth / 2;
-const float capWidth = gutterWidth / 2;
-const float capRadius = 3.f + mm2px(.5f); 
-const NVGcolor borderColor = nvgRGB(96, 96, 96);
-const NVGcolor capColor = nvgRGB(240, 246, 253);
-const NVGcolor dotColor = nvgRGB(240, 246, 253);
+namespace {
+  const float rectRadius = 3.f;
+  const float gutterWidth = 1;
+  const float borderWidth = gutterWidth / 2;
+  const float capWidth = gutterWidth / 2;
+  const float capRadius = 3.f + mm2px(.5f); 
+  const NVGcolor borderColor = nvgRGB(96, 96, 96);
+  const NVGcolor capColor = nvgRGB(240, 246, 253);
+  const NVGcolor dotColor = nvgRGB(240, 246, 253);
+}
 
-Grid::Grid() : tooltip(new ui::Tooltip()) {
+Grid::Grid()
+  : tooltip(new ui::Tooltip())
+{
   tooltip->visible = false;
   APP->scene->addChild(tooltip);
 }
@@ -180,4 +184,3 @@ void Grid::onButton(const ButtonEvent& event) {
     Widget::onButton(event);
   }
 }
-

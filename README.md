@@ -25,12 +25,6 @@ The token is *not* saved with patches, but the loaded activity is, so you don't 
 
 ## TODO
 
-* big code cleanup
-    * more use of auto
-    * organize headers
-    * use initializer lists consistently
-    * clean up github api behavior
-    * inline some stuff?
 * custom controls
     * knobs, both sizes
         * draw arcs in nanovg, should make design easier
@@ -41,10 +35,10 @@ The token is *not* saved with patches, but the loaded activity is, so you don't 
     * ports?
         * no, but maybe a custom widget anyway to include output indicator border
 * input/output modal with raw values string (comma separated)
-    * replace seed
+    * keep seed separate - make sure that you can open and just hit "save" to make it reset any manual edits
 * Github build for all platforms
 * Upgrade to C++... 17? 20? What is safe w/VCVrack publishing?
-* vcv manual
+* manual
 * better plugin/author/repo name
     * include plugin name at top of svg? what about a logo?
 * Update readme with more info

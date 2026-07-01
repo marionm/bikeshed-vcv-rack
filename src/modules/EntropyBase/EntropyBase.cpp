@@ -10,7 +10,9 @@
 
 using namespace rack;
 
-EntropyBase::EntropyBase(int totalLength) : totalLength(totalLength) {
+EntropyBase::EntropyBase(int totalLength)
+  : totalLength(totalLength)
+{
   config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
 
   std::string clockLabel = "Clock";
@@ -194,18 +196,20 @@ void EntropyBase::updateIndex(const ProcessArgs& args, bool isRunning, bool isRe
 
   lights[RESET_LIGHT].setSmoothBrightness(resetPulse.process(args.sampleTime), args.sampleTime);
 
-  bool hitEos = eosPulse.process(args.sampleTime);
-  lights[EOS_LIGHT].setSmoothBrightness(hitEos, args.sampleTime);
-  outputs[EOS_OUTPUT].setVoltage(hitEos ? 10.f : 0.f);
+  if (didStep) {
+    bool hitEos = eosPulse.process(args.sampleTime);
+    lights[EOS_LIGHT].setSmoothBrightness(hitEos, args.sampleTime);
+    outputs[EOS_OUTPUT].setVoltage(hitEos ? 10.f : 0.f);
 
-  bool hitTrigger = triggerPulse.process(args.sampleTime);
-  lights[TRIGGER_LIGHT].setSmoothBrightness(hitTrigger, args.sampleTime);
-  outputs[TRIGGER_OUTPUT].setVoltage(hitTrigger ? 10.f : 0.f);
-  outputs[TRIGGER_OUTPUT].setVoltage(hitTrigger ? 10.f : 0.f);
+    bool hitTrigger = triggerPulse.process(args.sampleTime);
+    lights[TRIGGER_LIGHT].setSmoothBrightness(hitTrigger, args.sampleTime);
+    outputs[TRIGGER_OUTPUT].setVoltage(hitTrigger ? 10.f : 0.f);
+    outputs[TRIGGER_OUTPUT].setVoltage(hitTrigger ? 10.f : 0.f);
 
-  float value = getValue();
-  outputs[CV_OUTPUT].setVoltage(scaleValue(value));
-  updateGateOutput(args, value, didStep);
+    float value = getValue();
+    outputs[CV_OUTPUT].setVoltage(scaleValue(value));
+    updateGateOutput(args, value, didStep);
+  }
 }
 
 void EntropyBase::updateGateOutput(const ProcessArgs& args, float value, bool didStep) {

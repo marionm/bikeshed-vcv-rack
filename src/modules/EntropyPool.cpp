@@ -9,8 +9,9 @@ static constexpr int ENTROPY_POOL_ROW_LENGTH = 24;
 static constexpr int ENTROPY_POOL_GRID_ITEM_WIDTH = 5;
 
 struct EntropyPool : EntropyBase {
-  EntropyPool() : EntropyBase(ENTROPY_POOL_LENGTH) {
-  }
+  EntropyPool()
+    : EntropyBase(ENTROPY_POOL_LENGTH)
+  {}
 };
 
 struct EntropyPoolWidget : EntropyBaseWidget {

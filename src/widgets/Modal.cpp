@@ -3,48 +3,49 @@
 
 using namespace rack;
 
-// TODO: Autosizing based on children would be cool...
-struct ModalButton : ui::Button {
-  ModalButton(Modal* modal)
-    : modal(modal)
-  {
-    box.size = Vec(64, 21);
-  }
+namespace {
+  struct ModalButton : ui::Button {
+    ModalButton(Modal* modal)
+      : modal(modal)
+    {
+      box.size = Vec(64, 21);
+    }
 
-  Modal* modal;
-};
+    Modal* modal;
+  };
 
-struct ModalSaveButton : ModalButton {
-  ModalSaveButton(Modal* modal)
-    : ModalButton(modal)
-  {
-    text = "Save";
-    box.pos = Vec(modal->box.size.x - box.size.x - 14.f, modal->box.size.y - box.size.y - 8.f);
-  }
+  struct ModalSaveButton : ModalButton {
+    ModalSaveButton(Modal* modal)
+      : ModalButton(modal)
+    {
+      text = "Save";
+      box.pos = Vec(modal->box.size.x - box.size.x - 14.f, modal->box.size.y - box.size.y - 8.f);
+    }
 
-  void onAction(const event::Action& e) override {
-    try {
-      if (modal->onSave()) {
+    void onAction(const event::Action& e) override {
+      try {
+        if (modal->onSave()) {
+          Popup::close(modal);
+        }
+      } catch(...) {
         Popup::close(modal);
       }
-    } catch(...) {
+    }
+  };
+
+  struct ModalCancelButton : ModalButton {
+    ModalCancelButton(Modal* modal)
+      : ModalButton(modal)
+    {
+      text = "Cancel";
+      box.pos = Vec(modal->box.size.x - (box.size.x * 2) - 22.f, modal->box.size.y - box.size.y - 8.f);
+    }
+
+    void onAction(const event::Action& e) override {
       Popup::close(modal);
     }
-  }
-};
-
-struct ModalCancelButton : ModalButton {
-  ModalCancelButton(Modal* modal)
-    : ModalButton(modal)
-  {
-    text = "Cancel";
-    box.pos = Vec(modal->box.size.x - (box.size.x * 2) - 22.f, modal->box.size.y - box.size.y - 8.f);
-  }
-
-  void onAction(const event::Action& e) override {
-    Popup::close(modal);
-  }
-};
+  };
+}
 
 Modal::Modal(int width, int height) {
   box.size = Vec(width, height);
@@ -55,8 +56,7 @@ Modal::Modal(int width, int height) {
   new Popup(this);
 }
 
-void Modal::onOpen() {
-}
+void Modal::onOpen() {}
 
 void Modal::close(Modal* modal) {
   Popup::close(modal);

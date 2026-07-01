@@ -4,33 +4,35 @@
 
 using namespace rack;
 
-struct GridValueEditorInput : ui::TextField {
-  float* pValue;
-  GridValueEditorInput(float* pValue) : pValue(pValue) {}
+namespace {
+  struct GridValueEditorInput : ui::TextField {
+    float* pValue;
+    GridValueEditorInput(float* pValue) : pValue(pValue) {}
 
-  bool wasFocused = false;
-  void draw(const DrawArgs& args) override{
-    ui::TextField::draw(args);
+    bool wasFocused = false;
+    void draw(const DrawArgs& args) override{
+      ui::TextField::draw(args);
 
-    if (!wasFocused) {
-      APP->event->setSelectedWidget(this);
-      this->selectAll();
-      wasFocused = true;
-    }
-  }
-
-  void onAction(const ActionEvent& e) override {
-    ui::TextField::onAction(e);
-
-    if (pValue) {
-      try {
-        *pValue = clamp01(std::stof(this->text));
-      } catch (...) {}
+      if (!wasFocused) {
+        APP->event->setSelectedWidget(this);
+        this->selectAll();
+        wasFocused = true;
+      }
     }
 
-    Popup::close(this);
-  }
-};
+    void onAction(const ActionEvent& e) override {
+      ui::TextField::onAction(e);
+
+      if (pValue) {
+        try {
+          *pValue = clamp01(std::stof(this->text));
+        } catch (...) {}
+      }
+
+      Popup::close(this);
+    }
+  };
+}
 
 GridValueEditor::GridValueEditor(int index, float* pValue) {
   ui::MenuLabel* label = new ui::MenuLabel();

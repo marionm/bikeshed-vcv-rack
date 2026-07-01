@@ -2,6 +2,13 @@
 
 using namespace rack;
 
+void Checkbox::onButton(const event::Button& e) {
+  if (e.button == GLFW_MOUSE_BUTTON_LEFT && e.action == GLFW_PRESS) {
+    value = !value;
+    e.consume(this);
+  }
+}
+
 // Trying to use VCVRack widgets feels even worse than just drawing a checkbox manually
 void Checkbox::draw(const DrawArgs& args) {
   nvgBeginPath(args.vg);
@@ -22,11 +29,4 @@ void Checkbox::draw(const DrawArgs& args) {
   nvgFontFaceId(args.vg, APP->window->uiFont->handle);
   nvgTextAlign(args.vg, NVG_ALIGN_LEFT | NVG_ALIGN_MIDDLE);
   nvgText(args.vg, 22, 7.5, label.c_str(), nullptr);
-}
-
-void Checkbox::onButton(const event::Button& e) {
-  if (e.button == GLFW_MOUSE_BUTTON_LEFT && e.action == GLFW_PRESS) {
-    value = !value;
-    e.consume(this);
-  }
 }

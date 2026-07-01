@@ -5,6 +5,11 @@
 #include <vector>
 
 struct EntropyBase : rack::Module {
+  EntropyBase(int totalLength);
+  bool isInRange(int index) const;
+  void randomizeSeed();
+  void randomizeValues();
+
   enum ParamId {
     CLOCK_PARAM,
     RUN_PARAM,
@@ -57,33 +62,10 @@ struct EntropyBase : rack::Module {
   int maxIndex = 0; // max is somehat misleading, as it can wrap
   float minValue = 0;
   float maxValue = 0;
-  float gridItemWidth = 5;
 
   uint32_t seed = 42u;
 
-  EntropyBase(int totalLength);
-  bool isInRange(int index) const;
-  void randomizeSeed();
-  void randomizeValues();
-
 private:
-  rack::dsp::SchmittTrigger clockButtonTrigger;
-  rack::dsp::SchmittTrigger clockTrigger;
-  rack::dsp::PulseGenerator clockPulse;
-
-  rack::dsp::SchmittTrigger runTrigger;
-
-  rack::dsp::SchmittTrigger resetButtonTrigger;
-  rack::dsp::SchmittTrigger resetTrigger;
-  rack::dsp::PulseGenerator resetPulse;
-
-  rack::dsp::SchmittTrigger randomButtonTrigger;
-  rack::dsp::SchmittTrigger randomTrigger;
-  rack::dsp::PulseGenerator randomPulse;
-
-  rack::dsp::PulseGenerator eosPulse;
-  rack::dsp::PulseGenerator triggerPulse;
-
   void onRandomize() override;
   void onReset() override;
 
@@ -109,4 +91,21 @@ private:
 
   json_t* dataToJson() override;
   void dataFromJson(json_t* root) override;
+
+  rack::dsp::SchmittTrigger clockButtonTrigger;
+  rack::dsp::SchmittTrigger clockTrigger;
+  rack::dsp::PulseGenerator clockPulse;
+
+  rack::dsp::SchmittTrigger runTrigger;
+
+  rack::dsp::SchmittTrigger resetButtonTrigger;
+  rack::dsp::SchmittTrigger resetTrigger;
+  rack::dsp::PulseGenerator resetPulse;
+
+  rack::dsp::SchmittTrigger randomButtonTrigger;
+  rack::dsp::SchmittTrigger randomTrigger;
+  rack::dsp::PulseGenerator randomPulse;
+
+  rack::dsp::PulseGenerator eosPulse;
+  rack::dsp::PulseGenerator triggerPulse;
 };

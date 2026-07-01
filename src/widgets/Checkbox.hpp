@@ -10,6 +10,6 @@ struct Checkbox : rack::widget::OpaqueWidget {
   bool value = false;
 
 private:
-  void draw(const DrawArgs& args) override;
   void onButton(const rack::event::Button& e) override;
+  void draw(const DrawArgs& args) override;
 };

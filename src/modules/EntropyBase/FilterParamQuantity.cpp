@@ -39,6 +39,5 @@ void FilterParamQuantity::setDisplayValueString(std::string string) {
     }
 
     setValue(value);
-  } catch(...) {
-  }
+  } catch(...) {}
 }

@@ -2,41 +2,21 @@
 
 #include <nlohmann/json_fwd.hpp>
 
-#include <atomic>
-#include <mutex>
+#include <functional>
 #include <string>
-#include <thread>
 #include <vector>
 
 struct GitHubIntegration {
-  enum class RefreshStatus { 
-    Idle, 
-    InProgress, 
-    Error 
+  struct Result {
+    bool success;
+    std::string error;
+    std::vector<float> values;
   };
 
-  std::string auth;
-  int targetSize = 64;
-  bool includeWeekends = true;
+  using Callback = std::function<void(Result)>;
 
-  std::atomic<RefreshStatus> refreshStatus{RefreshStatus::Idle};
-  std::atomic<bool> lastFetchSucceeded{false};
-
-  std::vector<float> values;
-  std::mutex dataMutex;
-
-  GitHubIntegration();
-  ~GitHubIntegration();
-
-  void triggerFetch(const std::string& newAuth);
+  static void fetchNormalizedContributions(std::string nameAndToken, int length, bool includeWeekends, Callback callback);
 
 private:
-  void workerLoop();
-  void fetchContributions();
-  void setValues(const nlohmann::json& contributions); // Works perfectly now
-                                                       //
-  std::thread worker;
-  std::atomic<bool> stopWorker{false};
-  std::atomic<bool> shouldFetch{false};
+  static std::vector<float> normalizeContributions(const nlohmann::json& contributions, int length, bool includeWeekends);
 };
-

@@ -2,16 +2,19 @@
 
 using namespace rack;
 
-Popup::Popup(Widget* widget) : ui::MenuOverlay() {
-  center = true;
-
+Popup::Popup(Widget* widget)
+  : ui::MenuOverlay(),
+    center(true)
+{
   content = widget;
   addChild(widget);
 
   APP->scene->addChild(this);
 }
 
-Popup::Popup(Widget* widget, const math::Vec& pos) : Popup(widget) {
+Popup::Popup(Widget* widget, const math::Vec& pos)
+  : Popup(widget)
+{
   center = false;
   content->box.pos = pos;
 }
