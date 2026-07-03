@@ -4,7 +4,7 @@
 
 struct FilterParamQuantity : rack::ParamQuantity {
   std::string getString() override;
-  std::string getDisplayValueString() override;
-  void setDisplayValueString(std::string string) override;
+  float getDisplayValue() override;
+  void setDisplayValue(float value) override;
 };
 

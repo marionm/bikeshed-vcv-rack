@@ -18,8 +18,8 @@ struct EntropyBase : rack::Module {
     SCALE_PARAM,
     START_PARAM,
     START_CV_PARAM,
-    LENGTH_PARAM,
-    LENGTH_CV_PARAM,
+    OFFSET_PARAM,
+    OFFSET_CV_PARAM,
     FILTER_PARAM,
     FILTER_CV_PARAM,
     NUM_PARAMS
@@ -31,7 +31,7 @@ struct EntropyBase : rack::Module {
     RESET_INPUT,
     RANDOM_INPUT,
     START_INPUT,
-    LENGTH_INPUT,
+    OFFSET_INPUT,
     FILTER_INPUT,
     NUM_INPUTS
   };

@@ -2,7 +2,7 @@
 
 #include <string>
 
-struct ScaleParamQuantity : rack::ParamQuantity {
+struct OffsetParamQuantity : rack::ParamQuantity {
   std::string getString() override;
   float getDisplayValue() override;
   void setDisplayValue(float value) override;

@@ -8,26 +8,19 @@ std::string FilterParamQuantity::getString() {
   if (value == 0.f) {
     return getLabel() + ": None";
   } else if (value > 0.f) {
-    return getLabel() + string::f(" >= %.2f", value);
+    return getLabel() + string::f(" >= %.2g", value);
   } else {
-    return getLabel() + string::f(" <= %.2f", value + 1);
+    return getLabel() + string::f(" <= %.2g", value + 1.f);
   }
 }
 
-std::string FilterParamQuantity::getDisplayValueString() {
+float FilterParamQuantity::getDisplayValue() {
   float value = getValue();
-
-  if (value >= 0.f) {
-    return std::to_string(value);
-  } else {
-    return "-" + std::to_string(value + 1);
-  }
+  return value >= 0.f ? value : (value + 1.f) * -1.f;
 }
 
-void FilterParamQuantity::setDisplayValueString(std::string string) {
+void FilterParamQuantity::setDisplayValue(float value) {
   try {
-    float value = std::stof(string);
-
     if (value < 0.f) {
       value = -1.f - value;
     }

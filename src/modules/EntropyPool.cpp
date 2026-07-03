@@ -30,7 +30,7 @@ struct EntropyPoolWidget : EntropyBaseWidget {
     float d = 16;
     addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(x + d * 0, y)), module, EntropyPool::START_PARAM));
     addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(x + d * 1, y)), module, EntropyPool::FILTER_PARAM));
-    addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(x + d * 2, y)), module, EntropyPool::LENGTH_PARAM));
+    addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(x + d * 2, y)), module, EntropyPool::OFFSET_PARAM));
 
     x = 12.74;
     y = 94.5;
@@ -43,7 +43,7 @@ struct EntropyPoolWidget : EntropyBaseWidget {
     x = 67.74;
     addParam(createParamCentered<Trimpot>(mm2px(Vec(x + d * 0, y)), module, EntropyPool::START_CV_PARAM));
     addParam(createParamCentered<Trimpot>(mm2px(Vec(x + d * 1, y)), module, EntropyPool::FILTER_CV_PARAM));
-    addParam(createParamCentered<Trimpot>(mm2px(Vec(x + d * 2, y)), module, EntropyPool::LENGTH_CV_PARAM));
+    addParam(createParamCentered<Trimpot>(mm2px(Vec(x + d * 2, y)), module, EntropyPool::OFFSET_CV_PARAM));
 
     x = 111.74;
     addChild(createLightCentered<MediumLight<GreenLight>>(mm2px(Vec(x + d * 0, y)), module, EntropyPool::EOS_LIGHT));
@@ -62,7 +62,7 @@ struct EntropyPoolWidget : EntropyBaseWidget {
     x = 67.74;
     addInput(createInputCentered<DarkPJ301MPort>(mm2px(Vec(x + d * 0, y)), module, EntropyPool::START_INPUT));
     addInput(createInputCentered<DarkPJ301MPort>(mm2px(Vec(x + d * 1, y)), module, EntropyPool::FILTER_INPUT));
-    addInput(createInputCentered<DarkPJ301MPort>(mm2px(Vec(x + d * 2, y)), module, EntropyPool::LENGTH_INPUT));
+    addInput(createInputCentered<DarkPJ301MPort>(mm2px(Vec(x + d * 2, y)), module, EntropyPool::OFFSET_INPUT));
 
     x = 111.74;
     addOutput(createOutputCentered<DarkPJ301MPort>(mm2px(Vec(x + d * 0, y)), module, EntropyPool::EOS_OUTPUT));

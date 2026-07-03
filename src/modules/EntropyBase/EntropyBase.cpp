@@ -1,8 +1,7 @@
 #include "EntropyBase.hpp"
 #include "FilterParamQuantity.hpp"
-#include "LengthParamQuantity.hpp"
+#include "OffsetParamQuantity.hpp"
 #include "ScaleParamQuantity.hpp"
-#include "StartParamQuantity.hpp"
 #include "../../helpers/clamp.hpp"
 
 #include <random>
@@ -33,7 +32,8 @@ EntropyBase::EntropyBase(int totalLength)
 
   std::string startLabel = "Start index";
   configInput(START_INPUT, startLabel);
-  configParam<StartParamQuantity>(START_PARAM, 0.f, 1.f, 0.f, startLabel);
+  configParam(START_PARAM, 0, totalLength - 1.f, 0.f, startLabel);
+  getParamQuantity(START_PARAM)->snapEnabled = true;
   configParam(START_CV_PARAM, -1.f, 1.f, 0.f, startLabel.append(" CV"), "%", 0, 100);
   getParamQuantity(START_CV_PARAM)->randomizeEnabled = false;
 
@@ -43,12 +43,12 @@ EntropyBase::EntropyBase(int totalLength)
   configParam(FILTER_CV_PARAM, -1.f, 1.f, 0.f, filterLabel.append(" CV"), "%", 0, 100);
   getParamQuantity(FILTER_CV_PARAM)->randomizeEnabled = false;
 
-  int initialLength = 8;
-  std::string lengthLabel = "Length";
-  configInput(LENGTH_INPUT, lengthLabel);
-  configParam<LengthParamQuantity>(LENGTH_PARAM, -1.f, 1.f, (float)initialLength / totalLength, lengthLabel);
-  configParam(LENGTH_CV_PARAM, -1.f, 1.f, 0.f, lengthLabel.append(" CV"), "%", 0, 100);
-  getParamQuantity(LENGTH_CV_PARAM)->randomizeEnabled = false;
+  std::string offsetLabel = "Length";
+  configInput(OFFSET_INPUT, offsetLabel);
+  configParam<OffsetParamQuantity>(OFFSET_PARAM, 1.f - totalLength, totalLength - 1.f, 7.f, offsetLabel);
+  getParamQuantity(OFFSET_PARAM)->snapEnabled = true;
+  configParam(OFFSET_CV_PARAM, -1.f, 1.f, 0.f, offsetLabel.append(" CV"), "%", 0, 100);
+  getParamQuantity(OFFSET_CV_PARAM)->randomizeEnabled = false;
 
   configOutput(EOS_OUTPUT, "End of sequence");
   configOutput(TRIGGER_OUTPUT, "Trigger");
@@ -59,8 +59,6 @@ EntropyBase::EntropyBase(int totalLength)
   getParamQuantity(SCALE_PARAM)->randomizeEnabled = false;
 
   maxIndex = totalLength - 1;
-  ((LengthParamQuantity*)getParamQuantity(LENGTH_PARAM))->totalLength = totalLength;
-  ((StartParamQuantity*)getParamQuantity(START_PARAM))->totalLength = totalLength;
 
   randomizeValues();
 }
@@ -105,36 +103,22 @@ void EntropyBase::updateFilter() {
 }
 
 bool EntropyBase::updateRange() {
-  float initialStartRatio = clamp01(params[START_PARAM].getValue());
-  int initialStartIndex = (int)(initialStartRatio * (float)(totalLength - 0.5f));
+  int startIndex = params[START_PARAM].getValue();
+  int cvStartIndex = (inputs[START_INPUT].getVoltage() / 10.f * params[START_CV_PARAM].getValue() * (totalLength - 1.f));
+  startIndex = math::clamp(startIndex + cvStartIndex, 0, totalLength - 1);
 
-  float startRatio = clamp01(
-    initialStartRatio +
-    inputs[START_INPUT].getVoltage() / 10.f * params[START_CV_PARAM].getValue()
-  );
-  int startIndex = (int)(startRatio * (float)(totalLength - 0.5f));
+  int offset = params[OFFSET_PARAM].getValue();
+  int cvOffset = (inputs[OFFSET_INPUT].getVoltage() / 10.f * params[OFFSET_CV_PARAM].getValue() * (totalLength - 1.f));
+  offset = math::clamp(offset + cvOffset, 1 - totalLength, totalLength - 1);
 
-  float initialLengthRatio = clamp11(params[LENGTH_PARAM].getValue());
-  int initialLength = (int)(initialLengthRatio * (float)(totalLength - 0.5f));
-  float lengthRatio = clamp11(
-    initialLengthRatio +
-    inputs[LENGTH_INPUT].getVoltage() / 10.f * params[LENGTH_CV_PARAM].getValue()
-  );
-  int length = (int)(lengthRatio * (float)(totalLength - 0.5f));
-
-  bool isReversed = length < 0;
+  bool isReversed = offset < 0;
   if (isReversed) {
-    minIndex = clampRangeIndex(startIndex + length);
+    minIndex = clampRangeIndex(startIndex + offset);
     maxIndex = clampRangeIndex(startIndex);
-    initialLength--;
   } else {
     minIndex = clampRangeIndex(startIndex);
-    maxIndex = clampRangeIndex(startIndex + length);
-    initialLength++;
+    maxIndex = clampRangeIndex(startIndex + offset);
   }
-
-  ((StartParamQuantity*)getParamQuantity(START_PARAM))->index = clampRangeIndex(initialStartIndex);
-  ((LengthParamQuantity*)getParamQuantity(LENGTH_PARAM))->length = initialLength;
 
   clampIndex(isReversed);
 

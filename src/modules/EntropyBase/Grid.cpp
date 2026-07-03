@@ -163,7 +163,7 @@ void Grid::onLeave(const LeaveEvent& event) {
 
 void Grid::updateTooltip() {
   if (hoverIndex >= 0 && (size_t)hoverIndex < module->values.size()) {
-    tooltip->text = string::f("Index %i: %.2f", hoverIndex, module->values[hoverIndex]);
+    tooltip->text = string::f("Index %i: %.2g", hoverIndex, module->values[hoverIndex]);
   } else {
     tooltip->text = "";
   }
