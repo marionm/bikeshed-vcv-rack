@@ -81,7 +81,7 @@ private:
   bool isGateActive = false;
   float gateTime = 0.f;
   float maxGateTime = 0.f;
-  void updateGateOutput(const ProcessArgs& args, float value, bool didStep);
+  void updateGateOutput(const ProcessArgs& args, float value, bool didStep, bool isRunning);
 
   float getValue();
   float scaleValue(float value);

@@ -196,23 +196,20 @@ void EntropyBase::updateIndex(const ProcessArgs& args, bool isRunning, bool isRe
 
   lights[RESET_LIGHT].setSmoothBrightness(resetPulse.process(args.sampleTime), args.sampleTime);
 
-  if (didStep) {
-    bool hitEos = eosPulse.process(args.sampleTime);
-    lights[EOS_LIGHT].setSmoothBrightness(hitEos, args.sampleTime);
-    outputs[EOS_OUTPUT].setVoltage(hitEos ? 10.f : 0.f);
+  bool hitEos = eosPulse.process(args.sampleTime);
+  lights[EOS_LIGHT].setSmoothBrightness(hitEos, args.sampleTime);
+  outputs[EOS_OUTPUT].setVoltage(hitEos && isRunning ? 10.f : 0.f);
 
-    bool hitTrigger = triggerPulse.process(args.sampleTime);
-    lights[TRIGGER_LIGHT].setSmoothBrightness(hitTrigger, args.sampleTime);
-    outputs[TRIGGER_OUTPUT].setVoltage(hitTrigger ? 10.f : 0.f);
-    outputs[TRIGGER_OUTPUT].setVoltage(hitTrigger ? 10.f : 0.f);
+  bool hitTrigger = triggerPulse.process(args.sampleTime);
+  lights[TRIGGER_LIGHT].setSmoothBrightness(hitTrigger, args.sampleTime);
+  outputs[TRIGGER_OUTPUT].setVoltage(hitTrigger && isRunning ? 10.f : 0.f);
 
-    float value = getValue();
-    outputs[CV_OUTPUT].setVoltage(scaleValue(value));
-    updateGateOutput(args, value, didStep);
-  }
+  float value = getValue();
+  outputs[CV_OUTPUT].setVoltage(isRunning ? scaleValue(value) : 0);
+  updateGateOutput(args, value, didStep, isRunning);
 }
 
-void EntropyBase::updateGateOutput(const ProcessArgs& args, float value, bool didStep) {
+void EntropyBase::updateGateOutput(const ProcessArgs& args, float value, bool didStep, bool isRunning) {
   timeSinceLastClock += args.sampleTime;
 
   if (isGateActive) {
@@ -235,8 +232,8 @@ void EntropyBase::updateGateOutput(const ProcessArgs& args, float value, bool di
     timeSinceLastClock = 0.f;
   }
 
-  lights[GATE_LIGHT].setSmoothBrightness(isGateActive, args.sampleTime);
-  outputs[GATE_OUTPUT].setVoltage(isGateActive ? 10.f : 0.f);
+  lights[GATE_LIGHT].setSmoothBrightness(isGateActive && isRunning, args.sampleTime);
+  outputs[GATE_OUTPUT].setVoltage(isGateActive && isRunning ? 10.f : 0.f);
 }
 
 float EntropyBase::getValue() {
