@@ -4,6 +4,18 @@
 using namespace rack;
 
 namespace {
+  struct GridValueQuantity : Quantity {
+    float getValue() override {
+      return value;
+    }
+
+    void setValue(float value) override {
+      this->value = value;
+    }
+
+    float value;
+  };
+
   struct GridValueEditorInput : ui::TextField {
     float* pValue;
     GridValueEditorInput(float* pValue) : pValue(pValue) {}
@@ -22,10 +34,10 @@ namespace {
     void onAction(const ActionEvent& e) override {
       ui::TextField::onAction(e);
 
+      auto quantity = new GridValueQuantity();
+      quantity->setDisplayValueString(this->text);
       if (pValue) {
-        try {
-          *pValue = math::clamp(std::stof(this->text), 0.f, 1.f);
-        } catch (...) {}
+        *pValue = math::clamp(quantity->getValue(), 0.f, 1.f);
       }
 
       Popup::close(this);
@@ -45,7 +57,7 @@ GridValueEditor::GridValueEditor(int index, float* pValue) {
   input = new GridValueEditorInput(pValue);
   input->box.size = inputContainer->box.size;
   if (pValue) {
-    input->text = std::to_string(*pValue);
+    input->text = string::f("%g", *pValue);
   }
   inputContainer->addChild(input);
 }
