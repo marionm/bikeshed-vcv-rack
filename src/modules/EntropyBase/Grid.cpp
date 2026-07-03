@@ -1,6 +1,5 @@
 #include "Grid.hpp"
 #include "GridValueEditor.hpp"
-#include "../../helpers/clamp.hpp"
 #include "../../widgets/Popup.hpp"
 
 #include "nanovg.h"
@@ -151,7 +150,7 @@ void Grid::onHover(const HoverEvent& event) {
 
 void Grid::onDragMove(const DragMoveEvent& event) {
   float delta = event.mouseDelta.y / 200.f;
-  module->values[hoverIndex] = clamp01(module->values[hoverIndex] - delta);
+  module->values[hoverIndex] = math::clamp(module->values[hoverIndex] - delta, 0.f, 1.f);
   updateTooltip();
 }
 

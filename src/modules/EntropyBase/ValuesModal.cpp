@@ -1,6 +1,5 @@
 #include "ValuesModal.hpp"
 #include "TextFieldContainer.hpp"
-#include "../../helpers/clamp.hpp"
 
 #include <sstream>
 #include <string>
@@ -62,7 +61,7 @@ bool ValuesModal::onSave() {
 
       if (i < (int)tokens.size()) {
         std::string token = tokens[i];
-        value = string::trim(token).empty() ? 0 : clamp11(std::stof(token));
+        value = string::trim(token).empty() ? 0 : math::clamp(std::stof(token), -1.f, 1.f);
       } else {
         value = 0;
       }

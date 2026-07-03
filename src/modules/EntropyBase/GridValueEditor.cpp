@@ -1,5 +1,4 @@
 #include "GridValueEditor.hpp"
-#include "../../helpers/clamp.hpp"
 #include "../../widgets/Popup.hpp"
 
 using namespace rack;
@@ -25,7 +24,7 @@ namespace {
 
       if (pValue) {
         try {
-          *pValue = clamp01(std::stof(this->text));
+          *pValue = math::clamp(std::stof(this->text), 0.f, 1.f);
         } catch (...) {}
       }
 

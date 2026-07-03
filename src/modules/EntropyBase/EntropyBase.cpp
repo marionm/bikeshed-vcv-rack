@@ -2,7 +2,6 @@
 #include "FilterParamQuantity.hpp"
 #include "OffsetParamQuantity.hpp"
 #include "ScaleParamQuantity.hpp"
-#include "../../helpers/clamp.hpp"
 
 #include <random>
 #include <string>
@@ -85,9 +84,10 @@ void EntropyBase::process(const ProcessArgs& args) {
 }
 
 void EntropyBase::updateFilter() {
-  float filter = clamp11(
+  float filter = math::clamp(
     params[FILTER_PARAM].getValue() +
-    inputs[FILTER_INPUT].getVoltage() / 10.f * params[FILTER_CV_PARAM].getValue()
+    inputs[FILTER_INPUT].getVoltage() / 10.f * params[FILTER_CV_PARAM].getValue(),
+    -1.f, 1.f
   );
 
   if (filter == 0.f) {
