@@ -15,7 +15,7 @@ struct EntropyPool : EntropyBase {
 };
 
 struct EntropyPoolWidget : EntropyBaseWidget {
-  EntropyPoolWidget(EntropyPool* module) : EntropyBaseWidget(module, "res/EntropyPool3.svg") {
+  EntropyPoolWidget(EntropyPool* module) : EntropyBaseWidget(module, "res/EntropyPool4.svg") {
     Grid* grid = createWidget<Grid>(mm2px(Vec(6.24, 6.24)));
     grid->setSize(mm2px(Vec(145, 61)));
     grid->module = module;

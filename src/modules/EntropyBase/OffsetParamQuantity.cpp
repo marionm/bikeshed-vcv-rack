@@ -8,7 +8,7 @@ std::string OffsetParamQuantity::getString() {
   if (length >= 0.f) {
     return string::f("%s: %g", getLabel(), length);
   } else {
-    return string::f("%s: %g (reversed)", getLabel(), length);
+    return string::f("%s: %g (reversed)", getLabel(), -length);
   }
 }
 

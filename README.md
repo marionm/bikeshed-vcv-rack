@@ -1,4 +1,4 @@
-# sporkbomb VCV Rack plugin
+# Bikeshed VCV Rack plugin
 
 ## Entropy Pool
 

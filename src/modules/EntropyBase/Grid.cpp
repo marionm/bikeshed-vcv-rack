@@ -30,7 +30,7 @@ void Grid::draw(const DrawArgs& args) {
     bool isFiltered = module ? module->maxValue < value || value < module->minValue : false;
     bool isInRange = module ? module -> isInRange(i) : true;
 
-    const NVGcolor color = isInRange && !module->isMuted(i)
+    const NVGcolor color = isInRange && (!module || !module->isMuted(i))
       ? nvgRGBA(46, 160, 67, value * 255.f)
       : nvgRGBA(96, 96, 96, value * 255.f);
 
