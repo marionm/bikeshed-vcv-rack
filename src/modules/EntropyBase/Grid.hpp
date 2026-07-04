@@ -13,8 +13,10 @@ struct Grid : rack::OpaqueWidget {
   void onEnter(const EnterEvent& event) override;
   void onHover(const HoverEvent& event) override;
   void onDragMove(const DragMoveEvent& event) override;
+  void onDragEnd(const DragEndEvent& event) override;
   void onLeave(const LeaveEvent& event) override;
   void onButton(const ButtonEvent& event) override;
+  void onDoubleClick(const DoubleClickEvent& event) override;
 
   rack::ui::Tooltip* tooltip;
   int length, rowLength, itemWidth;
@@ -28,6 +30,8 @@ struct Grid : rack::OpaqueWidget {
 private:
   void updateTooltip();
 
+  bool dragging = false;
+  float dragDelta = 0.f;
   int hoverIndex = 0;
 };
 

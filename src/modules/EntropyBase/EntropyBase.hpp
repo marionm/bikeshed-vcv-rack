@@ -6,9 +6,17 @@
 
 struct EntropyBase : rack::Module {
   EntropyBase(int totalLength);
-  bool isInRange(int index) const;
+
+  void setValues(const std::vector<float>& values);
+  void resetValue(int index);
+
+  void toggleMute(int index);
+  bool isMuted(int index);
+
   void randomizeSeed();
   void randomizeValues();
+
+  bool isInRange(int index) const;
 
   enum ParamId {
     CLOCK_PARAM,
@@ -56,6 +64,7 @@ struct EntropyBase : rack::Module {
   };
 
   std::vector<float> values;
+
   const int totalLength;
   int minIndex = 0;
   int index = 0;
@@ -91,6 +100,9 @@ private:
 
   json_t* dataToJson() override;
   void dataFromJson(json_t* root) override;
+
+  std::vector<float> initialValues;
+  std::vector<bool> mutes;
 
   rack::dsp::SchmittTrigger clockButtonTrigger;
   rack::dsp::SchmittTrigger clockTrigger;

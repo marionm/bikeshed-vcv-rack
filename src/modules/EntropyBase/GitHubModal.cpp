@@ -2,10 +2,7 @@
 #include "GitHubModal.hpp"
 #include "TextFieldContainer.hpp"
 
-#include <chrono>
 #include <string>
-#include <thread>
-#include <vector>
 
 using namespace rack;
 
@@ -47,7 +44,7 @@ bool GitHubModal::onSave() {
     tokenField->text, module->totalLength, weekendsCheckbox->value,
     [=](GitHubIntegration::Result result) {
       if (result.success) {
-        module->values = result.values;
+        module->setValues(result.values);
         Modal::close(this);
       } else {
         statusLabel->color = nvgRGB(255, 0, 0);

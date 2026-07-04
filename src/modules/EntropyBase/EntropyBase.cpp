@@ -60,6 +60,25 @@ EntropyBase::EntropyBase(int totalLength)
   maxIndex = totalLength - 1;
 
   randomizeValues();
+  mutes.reserve(totalLength);
+  std::fill(mutes.begin(), mutes.end(), false);
+}
+
+void EntropyBase::setValues(const std::vector<float>& values) {
+  this->values = values;
+  initialValues = values;
+}
+
+void EntropyBase::resetValue(int index) {
+  values[index] = initialValues[index];
+}
+
+void EntropyBase::toggleMute(int index) {
+  mutes[index] = !mutes[index];
+}
+
+bool EntropyBase::isMuted(int index) {
+  return mutes[index];
 }
 
 void EntropyBase::onRandomize() {
@@ -72,6 +91,7 @@ void EntropyBase::onReset() {
   seed = 42u;
   index = 0;
   randomizeValues();
+  std::fill(mutes.begin(), mutes.end(), false);
 }
 
 void EntropyBase::process(const ProcessArgs& args) {
@@ -223,10 +243,10 @@ void EntropyBase::updateGateOutput(const ProcessArgs& args, float value, bool di
 float EntropyBase::getValue() {
   float value = values[index];
 
-  if (minValue <= value && value <= maxValue) {
-    return value;
+  if (mutes[index] || minValue > value || value > maxValue) {
+    return 0;
   } else {
-    return 0.f;
+    return value;
   }
 }
 
@@ -275,11 +295,13 @@ void EntropyBase::randomizeValues() {
   std::mt19937 rng(seed);
   std::uniform_real_distribution<float> distribution(0.f, 1.f);
 
-  values.clear();
+  std::vector<float> values;
   values.reserve(totalLength);
   for (int i = 0; i < (int)totalLength; ++i) {
     values.push_back(distribution(rng));
   }
+
+  setValues(values);
 }
 
 json_t* EntropyBase::dataToJson() {
@@ -290,6 +312,19 @@ json_t* EntropyBase::dataToJson() {
     json_array_append_new(valuesJson, json_real(value));
   }
   json_object_set_new(root, "values", valuesJson);
+
+  json_t* initialValuesJson = json_array();
+  for (auto& initialValue : initialValues) {
+    json_array_append_new(initialValuesJson, json_real(initialValue));
+  }
+  json_object_set_new(root, "initialValues", initialValuesJson);
+
+  json_t* mutesJson = json_array();
+  for (bool mute : mutes) {
+    json_array_append_new(mutesJson, json_real(mute ? 1 : 0));
+  }
+  json_object_set_new(root, "mutes", mutesJson);
+
   json_object_set_new(root, "seed", json_integer(seed));
   json_object_set_new(root, "index", json_integer(index));
 
@@ -306,6 +341,44 @@ void EntropyBase::dataFromJson(json_t* root) {
         if (json_is_number(valueJson)) {
           values.push_back((float)json_number_value(valueJson));
         }
+      }
+
+      while (values.size() < (size_t)totalLength) {
+        values.push_back(0.f);
+      }
+    }
+  }
+
+  if (json_t* initialValuesJson = json_object_get(root, "initialValues")) {
+    if (json_is_array(initialValuesJson)) {
+      initialValues.clear();
+      size_t index;
+      json_t* initialValueJson;
+      json_array_foreach(initialValuesJson, index, initialValueJson) {
+        if (json_is_number(initialValueJson)) {
+          initialValues.push_back((float)json_number_value(initialValueJson));
+        }
+      }
+
+      while (initialValues.size() < (size_t)totalLength) {
+        initialValues.push_back(0.f);
+      }
+    }
+  }
+
+  if (json_t* mutesJson = json_object_get(root, "mutes")) {
+    if (json_is_array(mutesJson)) {
+      mutes.clear();
+      size_t index;
+      json_t* muteJson;
+      json_array_foreach(mutesJson, index, muteJson) {
+        if (json_is_number(muteJson)) {
+          mutes.push_back(json_number_value(muteJson) == 1);
+        }
+      }
+
+      while (mutes.size() < (size_t)totalLength) {
+        mutes.push_back(false);
       }
     }
   }

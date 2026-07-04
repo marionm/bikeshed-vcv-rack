@@ -1,9 +1,11 @@
 #pragma once
 
+#include "EntropyBase.hpp"
+
 #include <rack.hpp>
 
 struct GridValueEditor : rack::ui::Menu {
-  GridValueEditor(int index, float* pValue);
+  GridValueEditor(EntropyBase* module, int index);
 
 private:
   rack::ui::TextField* input;

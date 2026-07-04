@@ -30,7 +30,7 @@ void Grid::draw(const DrawArgs& args) {
     bool isFiltered = module ? module->maxValue < value || value < module->minValue : false;
     bool isInRange = module ? module -> isInRange(i) : true;
 
-    const NVGcolor color = isInRange
+    const NVGcolor color = isInRange && !module->isMuted(i)
       ? nvgRGBA(46, 160, 67, value * 255.f)
       : nvgRGBA(96, 96, 96, value * 255.f);
 
@@ -149,9 +149,39 @@ void Grid::onHover(const HoverEvent& event) {
 }
 
 void Grid::onDragMove(const DragMoveEvent& event) {
-  float delta = event.mouseDelta.y / 200.f;
+  if (settings::allowCursorLock) {
+    APP->window->cursorLock();
+  }
+
+  int mods = APP->window->getMods();
+  float sensitivity;
+  if ((mods & GLFW_MOD_CONTROL) && (mods & GLFW_MOD_SHIFT)) {
+    sensitivity = 0.00005f;
+  } else if (mods & GLFW_MOD_CONTROL) {
+    sensitivity = 0.0005f;
+  } else {
+    sensitivity = 0.005f;
+  }
+
+  float delta = event.mouseDelta.y * sensitivity;
+  dragDelta += delta;
   module->values[hoverIndex] = math::clamp(module->values[hoverIndex] - delta, 0.f, 1.f);
   updateTooltip();
+}
+
+void Grid::onDragEnd(const DragEndEvent& event) {
+  if (dragging && dragDelta == 0.f) {
+    // Click/drag/dbl-click is weird in rack - handle a "left click" here
+    module->toggleMute(hoverIndex);
+  }
+
+  dragging = false;
+
+  if (settings::allowCursorLock) {
+    APP->window->cursorUnlock();
+  }
+
+  OpaqueWidget::onDragEnd(event);
 }
 
 void Grid::onLeave(const LeaveEvent& event) {
@@ -162,7 +192,13 @@ void Grid::onLeave(const LeaveEvent& event) {
 
 void Grid::updateTooltip() {
   if (hoverIndex >= 0 && (size_t)hoverIndex < module->values.size()) {
-    tooltip->text = string::f("Index %i: %.2g", hoverIndex, module->values[hoverIndex]);
+    int mods = APP->window->getMods();
+    int sigfigs = ((mods & GLFW_MOD_CONTROL) && (mods & GLFW_MOD_SHIFT)) ? 3 : 2;
+    std::string label = string::f("Index %i: %." + std::to_string(sigfigs) + "g", hoverIndex, module->values[hoverIndex]);
+    if (module->isMuted(hoverIndex)) {
+      label += " (muted)";
+    }
+    tooltip->text = label;
   } else {
     tooltip->text = "";
   }
@@ -170,16 +206,22 @@ void Grid::updateTooltip() {
 
 void Grid::onButton(const ButtonEvent& event) {
   if (event.button == GLFW_MOUSE_BUTTON_RIGHT && event.action == GLFW_PRESS) {
-    GridValueEditor* editor = new GridValueEditor(hoverIndex, &module->values[hoverIndex]);
+    GridValueEditor* editor = new GridValueEditor(module, hoverIndex);
     new Popup(editor, getAbsoluteOffset(event.pos));
     event.consume(this);
     return;
   } else if (event.button == GLFW_MOUSE_BUTTON_LEFT && event.action == GLFW_PRESS) {
     // With onButton overridden, drag events only work if we also consume left clicks
     event.consume(this);
+    dragging = true;
+    dragDelta = 0.f;
     return;
-  } 
-  else {
+  } else {
     Widget::onButton(event);
   }
+
+}
+
+void Grid::onDoubleClick(const DoubleClickEvent& event) {
+  module->resetValue(hoverIndex);
 }
