@@ -60,8 +60,9 @@ EntropyBase::EntropyBase(int totalLength)
   maxIndex = totalLength - 1;
 
   randomizeValues();
-  mutes.reserve(totalLength);
-  std::fill(mutes.begin(), mutes.end(), false);
+  for (int i = 0; i < totalLength; i++) {
+    mutes.push_back(false);
+  }
 }
 
 void EntropyBase::setValues(const std::vector<float>& values) {
