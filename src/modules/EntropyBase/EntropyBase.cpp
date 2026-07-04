@@ -273,6 +273,11 @@ bool EntropyBase::clampIndex(bool isReversed) {
     index = isReversed ? maxIndex : minIndex;
     return true;
   } else {
+    if (index < 0) {
+      index += totalLength;
+    } else if (index >= totalLength) {
+      index -= totalLength;
+    }
     return false;
   }
 }
