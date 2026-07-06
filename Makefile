@@ -2,6 +2,7 @@ RACK_DIR ?= ../Rack-SDK
 
 FLAGS +=
 CFLAGS +=
+CXXFLAGS += -Isrc
 CXXFLAGS += -isystem extern
 CXXFLAGS += -D_WIN32_WINNT=0x0A00 # Target Windows 10/11 for httplib
 

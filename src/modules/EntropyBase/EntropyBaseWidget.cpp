@@ -3,7 +3,7 @@
 #include "SeedModal.hpp"
 #include "ValuesModal.hpp"
 
-#include "../../plugin.hpp"
+#include "bikeshed.hpp"
 
 using namespace rack;
 

@@ -1,4 +1,4 @@
-#include "plugin.hpp"
+#include "bikeshed.hpp"
 
 Plugin* pluginInstance;
 

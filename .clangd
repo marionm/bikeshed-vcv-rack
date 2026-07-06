@@ -1,9 +1,7 @@
 CompileFlags:
   Add:
-    - -std=gnu++17
-    - -Iextern
-    - -Iextern/json
-    - -Iextern/json/include
+    - -std=gnu++11
+    - -Iextern/nlohmann
     - -Iextern/httplib
-    - -I/home/mike/code/Rack-SDK/Rack-SDK/include
-    - -I/home/mike/code/Rack-SDK/Rack-SDK/dep/include
+    - -I${RACK_DIR}/include
+    - -I${RACK_DIR}/dep/include
