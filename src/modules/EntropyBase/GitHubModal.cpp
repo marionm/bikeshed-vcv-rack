@@ -16,7 +16,7 @@ GitHubModal::GitHubModal(EntropyBase* module)
     "  Set to load contribution history as values\n" \
     "  Optionally prefix with <username>@\n" \
     "  Use a classic token with 'repo' and 'read:user' for private data\n" \
-    "  Not saved with patch";
+    "  The token not saved with the patch";
   text->box.pos = Vec(7, 7);
   addChild(text);
 
