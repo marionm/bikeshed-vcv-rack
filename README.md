@@ -13,7 +13,8 @@ user's contribution history (the green boxes on their profile page) as the data 
 
 To load private activity, use a classic token with the `repo` and `read:user` permissions.
 
-The token is *not* saved with patches, but the loaded activity is, so you don't need to re-enter your token every time.
+The token is *not* saved with patches, but the loaded activity is, so you don't need to re-enter
+your token every time while saved patches remain are safe to distribute.
 
 # Development
 
