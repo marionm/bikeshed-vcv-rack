@@ -17,7 +17,7 @@ struct EntropyPool : EntropyBase {
 };
 
 struct EntropyPoolWidget : EntropyBaseWidget {
-  EntropyPoolWidget(EntropyPool* module) : EntropyBaseWidget(module, "res/EntropyPool5.svg") {
+  EntropyPoolWidget(EntropyPool* module) : EntropyBaseWidget(module, "res/EntropyPool6.svg") {
     Grid* grid = createWidget<Grid>(mm2px(Vec(6.24, 6.24)));
     grid->setSize(mm2px(Vec(145, 61)));
     grid->module = module;
@@ -68,10 +68,10 @@ struct EntropyPoolWidget : EntropyBaseWidget {
     addInput(createInputCentered<DarkPJ301MPort>(mm2px(Vec(x + d * 2, y)), module, EntropyPool::OFFSET_INPUT));
 
     x = 111.74;
-    addOutput(createOutputCentered<DarkPJ301MPort>(mm2px(Vec(x + d * 0, y)), module, EntropyPool::EOS_OUTPUT));
-    addOutput(createOutputCentered<DarkPJ301MPort>(mm2px(Vec(x + d * 1, y)), module, EntropyPool::TRIGGER_OUTPUT));
-    addOutput(createOutputCentered<DarkPJ301MPort>(mm2px(Vec(x + d * 2, y)), module, EntropyPool::GATE_OUTPUT));
-    addOutput(createOutputCentered<DarkPJ301MPort>(mm2px(Vec(x + d * 3, y)), module, EntropyPool::CV_OUTPUT));
+    addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(x + d * 0, y)), module, EntropyPool::EOS_OUTPUT));
+    addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(x + d * 1, y)), module, EntropyPool::TRIGGER_OUTPUT));
+    addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(x + d * 2, y)), module, EntropyPool::GATE_OUTPUT));
+    addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(x + d * 3, y)), module, EntropyPool::CV_OUTPUT));
   }
 };
 

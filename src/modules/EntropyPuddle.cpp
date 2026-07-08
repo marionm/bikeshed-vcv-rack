@@ -17,7 +17,7 @@ struct EntropyPuddle : EntropyBase {
 };
 
 struct EntropyPuddleWidget : EntropyBaseWidget {
-  EntropyPuddleWidget(EntropyPuddle* module) : EntropyBaseWidget(module, "res/EntropyPuddle5.svg") {
+  EntropyPuddleWidget(EntropyPuddle* module) : EntropyBaseWidget(module, "res/EntropyPuddle6.svg") {
     Grid* grid = createWidget<Grid>(mm2px(Vec(4.14, 6.24)));
     grid->setSize(mm2px(Vec(73, 49)));
     grid->module = module;
@@ -58,10 +58,10 @@ struct EntropyPuddleWidget : EntropyBaseWidget {
 
     x = 18.64;
     y = 113.115; // Lines up with many VCV plugins
-    addOutput(createOutputCentered<DarkPJ301MPort>(mm2px(Vec(x + d * 0, y)), module, EntropyPuddle::EOS_OUTPUT));
-    addOutput(createOutputCentered<DarkPJ301MPort>(mm2px(Vec(x + d * 1, y)), module, EntropyPuddle::TRIGGER_OUTPUT));
-    addOutput(createOutputCentered<DarkPJ301MPort>(mm2px(Vec(x + d * 2, y)), module, EntropyPuddle::GATE_OUTPUT));
-    addOutput(createOutputCentered<DarkPJ301MPort>(mm2px(Vec(x + d * 3, y)), module, EntropyPuddle::CV_OUTPUT));
+    addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(x + d * 0, y)), module, EntropyPuddle::EOS_OUTPUT));
+    addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(x + d * 1, y)), module, EntropyPuddle::TRIGGER_OUTPUT));
+    addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(x + d * 2, y)), module, EntropyPuddle::GATE_OUTPUT));
+    addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(x + d * 3, y)), module, EntropyPuddle::CV_OUTPUT));
     addParam(createParamCentered<SmallKnob<>>(mm2px(Vec(x + d * 4, y)), module, EntropyPuddle::SCALE_PARAM));
   }
 };

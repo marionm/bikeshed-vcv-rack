@@ -25,8 +25,6 @@ The token is *not* saved with patches, but the loaded activity is, so you don't 
 
 ## TODO
 
-* Custom ports?
-    * VCV rack, minus the lines, plus a colored inner ring version for outputs
 * Github build for all platforms
 * Manual
 * Readme
