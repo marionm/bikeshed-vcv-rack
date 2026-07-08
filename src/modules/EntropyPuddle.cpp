@@ -2,6 +2,7 @@
 #include "EntropyBase/EntropyBase.hpp"
 #include "EntropyBase/EntropyBaseWidget.hpp"
 #include "EntropyBase/Grid.hpp"
+#include "components/Knob.hpp"
 
 using namespace bikeshed;
 
@@ -16,7 +17,7 @@ struct EntropyPuddle : EntropyBase {
 };
 
 struct EntropyPuddleWidget : EntropyBaseWidget {
-  EntropyPuddleWidget(EntropyPuddle* module) : EntropyBaseWidget(module, "res/EntropyPuddle4.svg") {
+  EntropyPuddleWidget(EntropyPuddle* module) : EntropyBaseWidget(module, "res/EntropyPuddle5.svg") {
     Grid* grid = createWidget<Grid>(mm2px(Vec(4.14, 6.24)));
     grid->setSize(mm2px(Vec(73, 49)));
     grid->module = module;
@@ -29,18 +30,18 @@ struct EntropyPuddleWidget : EntropyBaseWidget {
     float x = 24.64;
     float y = 70;
     float d = 16;
-    addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(x + d * 0, y)), module, EntropyPuddle::START_PARAM));
-    addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(x + d * 1, y)), module, EntropyPuddle::FILTER_PARAM));
-    addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(x + d * 2, y)), module, EntropyPuddle::OFFSET_PARAM));
+    addParam(createParamCentered<MediumKnob<false, true>>(mm2px(Vec(x + d * 0, y)), module, EntropyPuddle::START_PARAM));
+    addParam(createParamCentered<MediumKnob<>>(mm2px(Vec(x + d * 1, y)), module, EntropyPuddle::FILTER_PARAM));
+    addParam(createParamCentered<MediumKnob<>>(mm2px(Vec(x + d * 2, y)), module, EntropyPuddle::OFFSET_PARAM));
 
     x = 7.64;
     y = 82.5;
     d = 11;
     addChild(createLightParamCentered<VCVLightBezel<WhiteLight>>(mm2px(Vec(x + d * 0, y)), module, EntropyPuddle::CLOCK_PARAM, EntropyPuddle::CLOCK_LIGHT));
     addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<WhiteLight>>>(mm2px(Vec(x + d * 1, y)), module, EntropyPuddle::RUN_PARAM, EntropyPuddle::RUN_LIGHT));
-    addParam(createParamCentered<Trimpot>(mm2px(Vec(x + d * 2, y)), module, EntropyPuddle::START_CV_PARAM));
-    addParam(createParamCentered<Trimpot>(mm2px(Vec(x + d * 3, y)), module, EntropyPuddle::FILTER_CV_PARAM));
-    addParam(createParamCentered<Trimpot>(mm2px(Vec(x + d * 4, y)), module, EntropyPuddle::OFFSET_CV_PARAM));
+    addParam(createParamCentered<SmallKnob<>>(mm2px(Vec(x + d * 2, y)), module, EntropyPuddle::START_CV_PARAM));
+    addParam(createParamCentered<SmallKnob<>>(mm2px(Vec(x + d * 3, y)), module, EntropyPuddle::FILTER_CV_PARAM));
+    addParam(createParamCentered<SmallKnob<>>(mm2px(Vec(x + d * 4, y)), module, EntropyPuddle::OFFSET_CV_PARAM));
     addParam(createLightParamCentered<VCVLightBezel<WhiteLight>>(mm2px(Vec(x + d * 5, y)), module, EntropyPuddle::RESET_PARAM, EntropyPuddle::RESET_LIGHT));
     addParam(createLightParamCentered<VCVLightBezel<WhiteLight>>(mm2px(Vec(x + d * 6, y)), module, EntropyPuddle::RANDOM_PARAM, EntropyPuddle::RANDOM_LIGHT));
 
@@ -61,7 +62,7 @@ struct EntropyPuddleWidget : EntropyBaseWidget {
     addOutput(createOutputCentered<DarkPJ301MPort>(mm2px(Vec(x + d * 1, y)), module, EntropyPuddle::TRIGGER_OUTPUT));
     addOutput(createOutputCentered<DarkPJ301MPort>(mm2px(Vec(x + d * 2, y)), module, EntropyPuddle::GATE_OUTPUT));
     addOutput(createOutputCentered<DarkPJ301MPort>(mm2px(Vec(x + d * 3, y)), module, EntropyPuddle::CV_OUTPUT));
-    addParam(createParamCentered<Trimpot>(mm2px(Vec(x + d * 4, y)), module, EntropyPuddle::SCALE_PARAM));
+    addParam(createParamCentered<SmallKnob<>>(mm2px(Vec(x + d * 4, y)), module, EntropyPuddle::SCALE_PARAM));
   }
 };
 

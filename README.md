@@ -25,15 +25,8 @@ The token is *not* saved with patches, but the loaded activity is, so you don't 
 
 ## TODO
 
-* Custom controls
-    * Knobs, both sizes
-        * Draw arcs in nanovg, should make design easier
-    * Toggle button
-        * Match size of small knobs - with or without arcs?
-    * Light button
-        * Match size of small knobs - with or without arcs?
-    * Ports?
-        * No, but maybe a custom widget anyway to include output indicator border
+* Custom ports?
+    * VCV rack, minus the lines, plus a colored inner ring version for outputs
 * Github build for all platforms
 * Manual
 * Readme

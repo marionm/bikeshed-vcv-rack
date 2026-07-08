@@ -2,10 +2,13 @@
 #include "EntropyBase/EntropyBase.hpp"
 #include "EntropyBase/EntropyBaseWidget.hpp"
 #include "EntropyBase/Grid.hpp"
+#include "components/Knob.hpp"
 
 static constexpr int ENTROPY_POOL_LENGTH = 240;
 static constexpr int ENTROPY_POOL_ROW_LENGTH = 24;
 static constexpr int ENTROPY_POOL_GRID_ITEM_WIDTH = 5;
+
+using namespace bikeshed;
 
 struct EntropyPool : EntropyBase {
   EntropyPool()
@@ -14,7 +17,7 @@ struct EntropyPool : EntropyBase {
 };
 
 struct EntropyPoolWidget : EntropyBaseWidget {
-  EntropyPoolWidget(EntropyPool* module) : EntropyBaseWidget(module, "res/EntropyPool4.svg") {
+  EntropyPoolWidget(EntropyPool* module) : EntropyBaseWidget(module, "res/EntropyPool5.svg") {
     Grid* grid = createWidget<Grid>(mm2px(Vec(6.24, 6.24)));
     grid->setSize(mm2px(Vec(145, 61)));
     grid->module = module;
@@ -27,9 +30,9 @@ struct EntropyPoolWidget : EntropyBaseWidget {
     float x = 62.74;
     float y = 82;
     float d = 16;
-    addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(x + d * 0, y)), module, EntropyPool::START_PARAM));
-    addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(x + d * 1, y)), module, EntropyPool::FILTER_PARAM));
-    addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(x + d * 2, y)), module, EntropyPool::OFFSET_PARAM));
+    addParam(createParamCentered<MediumKnob<false, true>>(mm2px(Vec(x + d * 0, y)), module, EntropyPool::START_PARAM));
+    addParam(createParamCentered<MediumKnob<>>(mm2px(Vec(x + d * 1, y)), module, EntropyPool::FILTER_PARAM));
+    addParam(createParamCentered<MediumKnob<>>(mm2px(Vec(x + d * 2, y)), module, EntropyPool::OFFSET_PARAM));
     getParam(EntropyPool::START_PARAM);
 
     x = 12.74;
@@ -41,15 +44,15 @@ struct EntropyPoolWidget : EntropyBaseWidget {
     addParam(createLightParamCentered<VCVLightBezel<WhiteLight>>(mm2px(Vec(x + d * 3, y)), module, EntropyPool::RANDOM_PARAM, EntropyPool::RANDOM_LIGHT));
 
     x = 67.74;
-    addParam(createParamCentered<Trimpot>(mm2px(Vec(x + d * 0, y)), module, EntropyPool::START_CV_PARAM));
-    addParam(createParamCentered<Trimpot>(mm2px(Vec(x + d * 1, y)), module, EntropyPool::FILTER_CV_PARAM));
-    addParam(createParamCentered<Trimpot>(mm2px(Vec(x + d * 2, y)), module, EntropyPool::OFFSET_CV_PARAM));
+    addParam(createParamCentered<SmallKnob<>>(mm2px(Vec(x + d * 0, y)), module, EntropyPool::START_CV_PARAM));
+    addParam(createParamCentered<SmallKnob<>>(mm2px(Vec(x + d * 1, y)), module, EntropyPool::FILTER_CV_PARAM));
+    addParam(createParamCentered<SmallKnob<>>(mm2px(Vec(x + d * 2, y)), module, EntropyPool::OFFSET_CV_PARAM));
 
     x = 111.74;
     addChild(createLightCentered<MediumLight<GreenLight>>(mm2px(Vec(x + d * 0, y)), module, EntropyPool::EOS_LIGHT));
     addChild(createLightCentered<MediumLight<GreenLight>>(mm2px(Vec(x + d * 1, y)), module, EntropyPool::TRIGGER_LIGHT));
     addChild(createLightCentered<MediumLight<GreenLight>>(mm2px(Vec(x + d * 2, y)), module, EntropyPool::GATE_LIGHT));
-    addParam(createParamCentered<Trimpot>(mm2px(Vec(x + d * 3, y)), module, EntropyPool::SCALE_PARAM));
+    addParam(createParamCentered<SmallKnob<>>(mm2px(Vec(x + d * 3, y)), module, EntropyPool::SCALE_PARAM));
 
     x = 12.74;
     y = 113.115; // Lines up with many VCV plugins
