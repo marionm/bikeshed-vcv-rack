@@ -1,8 +1,7 @@
+#include "Bikeshed.hpp"
 #include "EntropyBase/EntropyBase.hpp"
 #include "EntropyBase/EntropyBaseWidget.hpp"
 #include "EntropyBase/Grid.hpp"
-
-#include "bikeshed.hpp"
 
 static constexpr int ENTROPY_POOL_LENGTH = 240;
 static constexpr int ENTROPY_POOL_ROW_LENGTH = 24;
@@ -31,6 +30,7 @@ struct EntropyPoolWidget : EntropyBaseWidget {
     addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(x + d * 0, y)), module, EntropyPool::START_PARAM));
     addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(x + d * 1, y)), module, EntropyPool::FILTER_PARAM));
     addParam(createParamCentered<RoundBlackKnob>(mm2px(Vec(x + d * 2, y)), module, EntropyPool::OFFSET_PARAM));
+    getParam(EntropyPool::START_PARAM);
 
     x = 12.74;
     y = 94.5;

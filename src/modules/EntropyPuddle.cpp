@@ -1,8 +1,9 @@
+#include "Bikeshed.hpp"
 #include "EntropyBase/EntropyBase.hpp"
 #include "EntropyBase/EntropyBaseWidget.hpp"
 #include "EntropyBase/Grid.hpp"
 
-#include "bikeshed.hpp"
+using namespace bikeshed;
 
 static constexpr int ENTROPY_PUDDLE_LENGTH = 96;
 static constexpr int ENTROPY_PUDDLE_ROW_LENGTH = 12;

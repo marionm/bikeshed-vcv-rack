@@ -1,9 +1,8 @@
+#include "Bikeshed.hpp"
 #include "EntropyBaseWidget.hpp"
 #include "GitHubModal.hpp"
 #include "SeedModal.hpp"
 #include "ValuesModal.hpp"
-
-#include "bikeshed.hpp"
 
 using namespace rack;
 
