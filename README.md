@@ -20,9 +20,9 @@ your token every time while saved patches remain are safe to distribute.
 
 ## Setup
 
-1. Download the Rack SDK to `../Rack-SDK`
-  * Or, download anywhere and set the `RACK_DIR` environment variable to its path
-2. `make && make install`
+1. Download the [Rack SDK](https://vcvrack.com/downloads/)
+2. Set the `RACK_DIR` environment variable to its path
+3. `make && make install`
 
 # License and Copyright
 
@@ -46,5 +46,4 @@ transaction log.
 * Github build for all platforms
 * Manual
 * Readme
-* Plugin name, config
 * Publish

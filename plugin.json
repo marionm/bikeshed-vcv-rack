@@ -6,12 +6,12 @@
   "brand": "Bikeshed",
   "author": "Mike Marion",
   "authorEmail": "",
-  "authorUrl": "https://github.com/marionm/",
-  "pluginUrl": "",
-  "manualUrl": "",
-  "sourceUrl": "",
+  "authorUrl": "https://github.com/marionm",
+  "pluginUrl": "https://github.com/marionm/bikeshed-vcv-rack",
+  "manualUrl": "https://github.com/marionm/bikeshed-vcv-rack/wiki",
+  "sourceUrl": "https://github.com/marionm/bikeshed-vcv-rack",
   "donateUrl": "",
-  "changelogUrl": "",
+  "changelogUrl": "https://github.com/marionm/bikeshed-vcv-rack/CHANGELOG.md",
   "modules": [
     {
       "slug": "EntropyPool",
