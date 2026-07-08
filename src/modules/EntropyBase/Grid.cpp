@@ -30,7 +30,7 @@ void Grid::draw(const DrawArgs& args) {
   for (int i = 0; i < length; i++) {
     float value = module ? module->values[i] : defaultDistribution(defaultRng);
     bool isFiltered = module ? module->maxValue < value || value < module->minValue : false;
-    bool isInRange = module ? module -> isInRange(i) : true;
+    bool isInRange = module ? module -> isInRange(i) : i < 8;
 
     const NVGcolor color = isInRange && (!module || !module->isMuted(i))
       ? nvgRGBA(46, 160, 67, value * 255.f)
@@ -52,7 +52,7 @@ void Grid::draw(const DrawArgs& args) {
       nvgFill(args.vg);
     }
 
-    if (!module || !isInRange) {
+    if (!isInRange) {
       continue;
     }
 
@@ -78,25 +78,25 @@ void Grid::draw(const DrawArgs& args) {
     // if (iBelow >= length) {
     //   iBelow -= length;
     // }
-    // if (!module->isInRange(iAbove) && i >= rowLength) {
+    // if (module ? !module->isInRange(iAbove) && i >= rowLength) {
     //   nvgBeginPath(args.vg);
     //   nvgMoveTo(args.vg, left, top);
     //   nvgLineTo(args.vg, right, top);
     //   nvgStroke(args.vg);
     // }
-    // if (!module->isInRange(iBelow) && i < length - rowLength) {
+    // if (module && !module->isInRange(iBelow) && i < length - rowLength) {
     //   nvgBeginPath(args.vg);
     //   nvgMoveTo(args.vg, left, bottom);
     //   nvgLineTo(args.vg, right, bottom);
     //   nvgStroke(args.vg);
     // }
-    // if (i == module->minIndex) {
+    // if (i == (module ? module->minIndex : 0)) {
     //   nvgBeginPath(args.vg);
     //   nvgMoveTo(args.vg, left, top);
     //   nvgLineTo(args.vg, left, bottom);
     //   nvgStroke(args.vg);
     // }
-    // if (i == module->maxIndex) {
+    // if (i == (module ? module->maxIndex : 7)) {
     //   nvgBeginPath(args.vg);
     //   nvgMoveTo(args.vg, right, top);
     //   nvgLineTo(args.vg, right, bottom);
@@ -107,7 +107,7 @@ void Grid::draw(const DrawArgs& args) {
     nvgStrokeColor(args.vg, capColor);
     nvgStrokeWidth(args.vg, mm2px(capWidth));
     nvgLineCap(args.vg, NVG_ROUND);
-    if (i == module->minIndex) {
+    if (i == (module ? module->minIndex : 0)) {
       nvgBeginPath(args.vg);
       nvgMoveTo(args.vg, cx, top);
       nvgArcTo(args.vg, left, top, left, bottom, capRadius);
@@ -115,7 +115,7 @@ void Grid::draw(const DrawArgs& args) {
       nvgLineTo(args.vg, cx, bottom);
       nvgStroke(args.vg);
     }
-    if (i == module->maxIndex) {
+    if (i == (module ? module->maxIndex : 7)) {
       nvgBeginPath(args.vg);
       nvgMoveTo(args.vg, cx, top);
       nvgArcTo(args.vg, right, top, right, bottom, capRadius);
@@ -125,7 +125,7 @@ void Grid::draw(const DrawArgs& args) {
     }
 
     // Active dot
-    if (i == module->index) {
+    if (i == (module ? module->index : 0)) {
       nvgBeginPath(args.vg);
       nvgCircle(args.vg, cx, cy, itemWidth / 1.5f);
       nvgFillColor(args.vg, dotColor);
