@@ -33,6 +33,5 @@ transaction log.
 
 ## TODO
 
-* Github build for all platforms
 * Manual
 * Publish
