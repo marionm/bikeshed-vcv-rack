@@ -139,6 +139,15 @@ void Grid::drawLayer(const DrawArgs& args, int layer) {
     }
 
     if (i == (module ? module->index : 0)) {
+      // Active glow
+      nvgBeginPath(args.vg);
+      nvgCircle(args.vg, cx, cy, itemWidth * 4.f);
+      auto innerColor = nvgRGBA(whiteR, whiteG, whiteB, activeA * .5f * settings::haloBrightness);
+      auto outerColor = nvgRGBA(whiteR, whiteG, whiteB, 0.f);
+      auto paint = nvgRadialGradient(args.vg, cx, cy, itemWidth, itemWidth * 4.f, innerColor, outerColor);
+      nvgFillPaint(args.vg, paint);
+      nvgFill(args.vg);
+
       // Active dot
       nvgBeginPath(args.vg);
       nvgCircle(args.vg, cx, cy, itemWidth / 1.5f);
