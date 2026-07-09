@@ -20,6 +20,7 @@ EntropyBase::EntropyBase(int totalLength)
   std::string runLabel = "Run";
   configInput(RUN_INPUT, runLabel);
   configButton(RUN_PARAM, runLabel);
+  getParam(RUN_PARAM).setValue(1.f);
 
   std::string resetLabel = "Reset";
   configInput(RESET_INPUT, resetLabel);
@@ -93,6 +94,7 @@ void EntropyBase::onReset() {
   index = 0;
   randomizeValues();
   std::fill(mutes.begin(), mutes.end(), false);
+  getParam(RUN_PARAM).setValue(1.f);
 }
 
 void EntropyBase::process(const ProcessArgs& args) {
