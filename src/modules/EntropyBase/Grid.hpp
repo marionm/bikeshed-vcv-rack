@@ -9,7 +9,7 @@
 struct Grid : rack::OpaqueWidget {
   Grid();
 
-  void draw(const DrawArgs &args) override;
+  void drawLayer(const DrawArgs &args, int layer) override;
   void onEnter(const EnterEvent& event) override;
   void onHover(const HoverEvent& event) override;
   void onDragMove(const DragMoveEvent& event) override;

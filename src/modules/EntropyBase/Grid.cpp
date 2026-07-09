@@ -4,6 +4,7 @@
 #include "widgets/Popup.hpp"
 
 #include "nanovg.h"
+#include <settings.hpp>
 
 using namespace bikeshed;
 using namespace rack;
@@ -14,9 +15,6 @@ namespace {
   const float borderWidth = gutterWidth / 2;
   const float capWidth = gutterWidth / 2;
   const float capRadius = 3.f + mm2px(.5f); 
-  // const NVGcolor borderColor = gray;
-  const NVGcolor capColor = white;
-  const NVGcolor dotColor = white;
 }
 
 Grid::Grid()
@@ -26,19 +24,35 @@ Grid::Grid()
   APP->scene->addChild(tooltip);
 }
 
-void Grid::draw(const DrawArgs& args) {
+// Called for layer 1 only, which does not dim with room lights
+void Grid::drawLayer(const DrawArgs& args, int layer) {
   for (int i = 0; i < length; i++) {
-    float value = module ? module->values[i] : defaultDistribution(defaultRng);
-    bool isFiltered = module ? module->maxValue < value || value < module->minValue : false;
     bool isInRange = module ? module -> isInRange(i) : i < 8;
+    bool isMuted = module && module->isMuted(i);
 
-    const NVGcolor color = isInRange && (!module || !module->isMuted(i))
-      ? nvgRGBA(46, 160, 67, value * 255.f)
-      : nvgRGBA(96, 96, 96, value * 255.f);
+    float activeA = 255.f * (settings::rackBrightness * .4f + .6f);
+    float inactiveA = 255.f * (settings::rackBrightness * .8f + .2f);
+    float r, g, b, a;
+    if (isInRange && !isMuted) {
+      r = 46.f;
+      g = 160.f;
+      b = 67.f;
+      a = activeA;
+    } else {
+      r = 96.f;
+      g = 96.f;
+      b = 96.f;
+      a = inactiveA;
+    }
+
+    float value = module ? module->values[i] : defaultDistribution(defaultRng);
+    const NVGcolor color = nvgRGBA(r, g, b, a * value);
 
     const int x = gutterWidth + (i % rowLength) * (itemWidth + gutterWidth);
     const int y = gutterWidth + (i / rowLength) * (itemWidth + gutterWidth);
 
+    // Value box
+    bool isFiltered = module ? module->maxValue < value || value < module->minValue : false;
     if (isFiltered) {
       nvgBeginPath(args.vg);
       nvgRoundedRect(args.vg, mm2px(x + .2f), mm2px(y + .2f), mm2px(itemWidth - .4f), mm2px(itemWidth - .4f), rectRadius);
@@ -104,7 +118,7 @@ void Grid::draw(const DrawArgs& args) {
     // }
 
     // Range caps
-    nvgStrokeColor(args.vg, capColor);
+    nvgStrokeColor(args.vg, nvgRGBA(whiteR, whiteG, whiteB, activeA));
     nvgStrokeWidth(args.vg, mm2px(capWidth));
     nvgLineCap(args.vg, NVG_ROUND);
     if (i == (module ? module->minIndex : 0)) {
@@ -124,11 +138,11 @@ void Grid::draw(const DrawArgs& args) {
       nvgStroke(args.vg);
     }
 
-    // Active dot
     if (i == (module ? module->index : 0)) {
+      // Active dot
       nvgBeginPath(args.vg);
       nvgCircle(args.vg, cx, cy, itemWidth / 1.5f);
-      nvgFillColor(args.vg, dotColor);
+      nvgFillColor(args.vg, nvgRGBA(whiteR, whiteG, whiteB, activeA));
       nvgFill(args.vg);
     }
   }
