@@ -8,11 +8,16 @@
 
 # Development
 
-## Setup
+## Local compilation
 
-1. Download the [Rack SDK](https://vcvrack.com/downloads/)
+1. Download the [Rack SDK](https://vcvrack.com/downloads/) for your platform
 2. Set the `RACK_DIR` environment variable to its path
 3. `make && make install`
+
+## Cross-platform compilation with Docker
+
+1. `docker compose run --rm build`
+    * Generates plugins in `./plugin-build`
 
 # License and Copyright
 

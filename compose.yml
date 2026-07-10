@@ -1,0 +1,11 @@
+services:
+  build:
+    image: mikemarion7/rack-plugin-toolchain:19
+    user: root
+    container_name: rack-plugin-toolchain
+    volumes:
+      - .:/home/build/plugin-src
+      - ./plugin-build:/home/build/rack-plugin-toolchain/plugin-build
+    environment:
+      - PLUGIN_DIR=/home/build/plugin-src
+    command: /bin/bash -c "make -j$${THREADS:-4} plugin-build"

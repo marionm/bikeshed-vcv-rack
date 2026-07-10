@@ -10,4 +10,5 @@
 /build
 /dep
 /dist
+/plugin-build
 compile_commands.json
