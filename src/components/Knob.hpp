@@ -100,14 +100,14 @@ namespace {
 template <bool centerPip = true, bool minPip = false>
 struct SmallKnob : Knob {
   SmallKnob()
-    : Knob("res/knob_sm_bg.svg", "res/knob_sm_fg.svg", 3.f, centerPip, minPip)
+    : Knob("res/components/knob_sm_bg.svg", "res/components/knob_sm_fg.svg", 3.f, centerPip, minPip)
   {}
 };
 
 template <bool centerPip = true, bool minPip = false>
 struct MediumKnob : Knob {
   MediumKnob()
-    : Knob("res/knob_md_bg.svg", "res/knob_md_fg.svg", 5.f, centerPip, minPip)
+    : Knob("res/components/knob_md_bg.svg", "res/components/knob_md_fg.svg", 5.f, centerPip, minPip)
   {}
 };
 
