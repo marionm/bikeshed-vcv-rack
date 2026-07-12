@@ -15,6 +15,8 @@ namespace {
   constexpr float MIN_ANGLE = -0.75f * M_PI;
   constexpr float MAX_ANGLE = -MIN_ANGLE;
 
+  // TODO: Not right - should be a TransparentWidget added as a child to a FramebufferWidget
+  //       Overriding FramebufferWidget::draw overrides the caching it does internally
   struct KnobArc : rack::FramebufferWidget {
     KnobArc(float r, bool centerPip, bool minPip)
       : r(r),
