@@ -52,8 +52,8 @@
      inkscape:document-units="mm"
      inkscape:lockguides="true"
      inkscape:zoom="2.8284271"
-     inkscape:cx="392.09071"
-     inkscape:cy="430.62803"
+     inkscape:cx="254.20489"
+     inkscape:cy="135.7645"
      inkscape:window-width="3840"
      inkscape:window-height="2054"
      inkscape:window-x="-11"
@@ -69,7 +69,16 @@
      id="path1"
      style="display:none;fill:#1c1c1c;fill-opacity:1;stroke-width:0.999995;stroke-dasharray:none"
      d="M 0,128.5 1.2255252e-6,0 157.47999,6.3238192e-7 V 128.5 Z"
-     inkscape:label="start habamax" /><g
+     inkscape:label="start habamax" /><rect
+     style="display:inline;fill:#000000;fill-opacity:0.41553748;stroke:none;stroke-width:0.563311;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1"
+     id="rect1"
+     width="157.47998"
+     height="61"
+     x="6.7025081e-07"
+     y="6.2399998"
+     rx="4.7855887"
+     ry="0.089229703"
+     inkscape:label="screen" /><g
      id="g16"
      inkscape:label="labels - jetbrains mono semibold"><path
        style="fill:none;fill-opacity:1;stroke:#f0f6fc;stroke-width:0.5;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1;paint-order:stroke fill markers"
@@ -220,7 +229,7 @@
      id="g23"
      inkscape:label="title - league mono ultralight semiexpanded modified l+kern"><path
        style="fill:#f0f6fc;fill-opacity:1;stroke:#f0f6fc;stroke-width:0.232;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:stroke fill markers"
-       d="M 7.24,68.567 H 149.20996"
+       d="M 7.2399998,68.567 H 150.23987"
        id="path73"
        sodipodi:nodetypes="cc"
        inkscape:label="border" /><path

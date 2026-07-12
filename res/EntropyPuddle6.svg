@@ -52,7 +52,16 @@
      id="path4"
      style="display:none;fill:#1c1c1c;fill-opacity:1;stroke-width:0.999998;stroke-dasharray:none"
      d="M 0,128.5 6.3252918e-7,0 81.28,6.3238192e-7 V 128.5 Z"
-     inkscape:label="start habamax" /><g
+     inkscape:label="start habamax" /><rect
+     style="display:inline;fill:#000000;fill-opacity:0.42;stroke:none;stroke-width:0.563312;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1"
+     id="rect775"
+     width="81.279999"
+     height="49"
+     x="2.6332006e-07"
+     y="6.2399998"
+     rx="4.7855892"
+     ry="0.089229695"
+     inkscape:label="screen" /><g
      id="g11"
      inkscape:label="labels - jetbrains mono semibold"><path
        style="display:inline;fill:none;fill-opacity:1;stroke:#f0f6fc;stroke-width:0.5;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1;paint-order:stroke fill markers"
@@ -386,7 +395,7 @@
        inkscape:label="clock"
        r="1.5" /><rect
        style="display:inline;fill:#ffff00;fill-opacity:1;stroke:none;stroke-width:0.563312;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1"
-       id="rect775"
+       id="rect1"
        width="73"
        height="49"
        x="4.1399999"
