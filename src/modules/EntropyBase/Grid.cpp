@@ -75,6 +75,8 @@ void Grid::drawContent(const DrawArgs& args) {
 
     const int x = gutterWidth + (i % rowLength) * (itemWidth + gutterWidth);
     const int y = gutterWidth + (i / rowLength) * (itemWidth + gutterWidth);
+    const float cx = mm2px(x + itemWidth / 2.f);
+    const float cy = mm2px(y + itemWidth / 2.f);
 
     // Value box
     bool isFiltered = module ? module->maxValue < value || value < module->minValue : false;
@@ -91,6 +93,21 @@ void Grid::drawContent(const DrawArgs& args) {
       nvgFill(args.vg);
     }
 
+    // Depth effect
+    // TODO: Better positioning, colors
+    // TODO: Invert colors when mouse down
+    // nvgStrokeWidth(args.vg, mm2px(.1f));
+    // nvgBeginPath(args.vg);
+    // nvgMoveTo(args.vg, cx, mm2px(y + .2f));
+    // nvgArcTo(args.vg, mm2px(x + .2f), mm2px(y + .2f), mm2px(x + .2f), mm2px(y + .4f), capRadius);
+    // nvgStrokeColor(args.vg, nvgRGBA(136.f, 136.f, 136.f, 48.f));
+    // nvgStroke(args.vg);
+    // nvgBeginPath(args.vg);
+    // nvgMoveTo(args.vg, cx, mm2px(y + itemWidth - .2f));
+    // nvgArcTo(args.vg, mm2px(x + itemWidth - .2f), mm2px(y + itemWidth - .2f), mm2px(x + itemWidth - .2f), mm2px(y + itemWidth - .4f), capRadius);
+    // nvgStrokeColor(args.vg, nvgRGBA(48.f, 48.f, 48.f, 48.f));
+    // nvgStroke(args.vg);
+
     if (!isInRange) {
       continue;
     }
@@ -99,8 +116,6 @@ void Grid::drawContent(const DrawArgs& args) {
     const float right = mm2px(x + itemWidth + borderWidth);
     const float bottom = mm2px(y + itemWidth + borderWidth);
     const float left = mm2px(x - borderWidth);
-    const float cx = mm2px(x + itemWidth / 2.f);
-    const float cy = mm2px(y + itemWidth / 2.f);
 
     // Range blob
     // Maybe nice as a toggle, as it looks cool in normal cases, but is noisy and just kind of weird
