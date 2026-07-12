@@ -24,8 +24,33 @@ Grid::Grid()
   APP->scene->addChild(tooltip);
 }
 
+void Grid::configure(int length, int rowLength, float itemWidth) {
+  this->length = length;
+  this->rowLength = rowLength;
+  this->itemWidth = itemWidth;
+
+  float width = (itemWidth + gutterWidth) * rowLength + 1;
+  float height = (itemWidth + gutterWidth) * length / rowLength + 1;
+  Vec size = mm2px(Vec(width, height));
+  setSize(size);
+}
+
+void Grid::draw(const DrawArgs& args) {
+  if (!module) {
+    // Draw content on base layer when module is null, i.e. in previews where drawLayer is not called
+    drawContent(args);
+  }
+}
+
 // Called for layer 1 only, which does not dim with room lights
 void Grid::drawLayer(const DrawArgs& args, int layer) {
+  if (module) {
+    drawContent(args);
+  }
+}
+
+// Called for layer 1 only, which does not dim with room lights
+void Grid::drawContent(const DrawArgs& args) {
   for (int i = 0; i < length; i++) {
     bool isInRange = module ? module -> isInRange(i) : i < 8;
     bool isMuted = module && module->isMuted(i);

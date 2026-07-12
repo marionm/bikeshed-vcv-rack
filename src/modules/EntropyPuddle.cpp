@@ -19,12 +19,8 @@ struct EntropyPuddle : EntropyBase {
 struct EntropyPuddleWidget : EntropyBaseWidget {
   EntropyPuddleWidget(EntropyPuddle* module) : EntropyBaseWidget(module, "res/EntropyPuddle6.svg") {
     Grid* grid = createWidget<Grid>(mm2px(Vec(4.14, 6.24)));
-    grid->setSize(mm2px(Vec(73, 49)));
     grid->module = module;
-    // Not from module, as module is null in the preview
-    grid->length = ENTROPY_PUDDLE_LENGTH;
-    grid->rowLength = ENTROPY_PUDDLE_ROW_LENGTH;
-    grid->itemWidth = ENTROPY_PUDDLE_GRID_ITEM_WIDTH;
+    grid->configure(ENTROPY_PUDDLE_LENGTH, ENTROPY_PUDDLE_ROW_LENGTH, ENTROPY_PUDDLE_GRID_ITEM_WIDTH);
     addChild(grid);
 
     float x = 24.64;

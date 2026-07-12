@@ -9,7 +9,12 @@
 struct Grid : rack::OpaqueWidget {
   Grid();
 
+  // Use this instead of relying on reading from module, as module will be null in previews
+  void configure(int length, int rowLength, float itemWidth);
+
+  void draw(const DrawArgs &args) override;
   void drawLayer(const DrawArgs &args, int layer) override;
+  void drawContent(const DrawArgs &args);
   void onEnter(const EnterEvent& event) override;
   void onHover(const HoverEvent& event) override;
   void onDragMove(const DragMoveEvent& event) override;
