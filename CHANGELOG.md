@@ -1,6 +1,6 @@
 # Bikeshed VCV Rack plugin changelog
 
-## 2.0.0
+## 2.1.0
 
 ### Entropy Pool
 
