@@ -35,8 +35,3 @@ the authors with authorship indicated by the GitHub transaction log.
 
 Copyright to this software is held by the authors with authorship indicated by the GitHub
 transaction log.
-
-## TODO
-
-* Manual
-* Publish
