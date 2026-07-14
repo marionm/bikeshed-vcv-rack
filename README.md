@@ -19,6 +19,31 @@
 1. `docker compose run --rm build`
     * Generates plugins in `./plugin-build`
 
+## Manual cross-platform compilation
+
+If you want to use the [VCV Rack Plugin Toolchain](https://github.com/VCVRack/rack-plugin-toolchain)
+yourself instead of the above docker command (which is using an image with the toolchain already),
+then be aware that the Linux build requires OpenSSL to be compiled and added as a dependency to the
+Linux toolchain. You may need to adjust some paths, but that looks like:
+
+```
+cd /tmp
+wget https://github.com/openssl/openssl/releases/download/openssl-3.0.15/openssl-3.0.15.tar.gz
+tar -xf openssl-3.0.15.tar.gz
+cd openssl-3.0.15
+
+./Configure linux-x86_64 no-shared \
+  --cross-compile-prefix=/home/build/rack-plugin-toolchain/local/x86_64-ubuntu16.04-linux-gnu/bin/x86_64-ubuntu16.04-linux-gnu- \
+  --prefix=/home/build/rack-plugin-toolchain/Rack-SDK-lin-x64/dep
+
+make -j$(nproc)
+make install_sw
+```
+
+The above should result in `libssl.a` and `libcrpyto.a` being placed in
+`/home/build/rack-plugin-toolchain/Rack-SDK-lin-x64/dep/lib64`, at which point the normal toolchain
+commands should work for all platforms.
+
 # License and Copyright
 
 This software is licensed under the Gnu General Public License v3 or later. The license is included

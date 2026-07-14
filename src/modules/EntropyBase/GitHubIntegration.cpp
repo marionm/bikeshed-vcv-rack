@@ -30,6 +30,8 @@ void GitHubIntegration::fetchNormalizedContributions(std::string nameAndToken, i
       }
 
       httplib::SSLClient client("api.github.com");
+      client.enable_server_certificate_verification(false);
+
       httplib::Headers headers = {
         {"Authorization", "Bearer " + token},
         {"Content-Type", "application/json"},
