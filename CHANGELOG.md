@@ -1,5 +1,11 @@
 # Bikeshed VCV Rack plugin changelog
 
+## 2.1.1
+
+### Entropy Pool and Entropy Puddle
+
+- Removed static OpenSSL dependency
+
 ## 2.1.0
 
 ### Entropy Pool
