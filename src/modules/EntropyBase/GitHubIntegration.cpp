@@ -1,16 +1,49 @@
-#define CPPHTTPLIB_OPENSSL_SUPPORT
-
 #include "GitHubIntegration.hpp"
 
-#include <httplib/httplib.h>
-#include <nlohmann/json.hpp>
-#include <rack.hpp>
+#include <curl/curl.h>
 
 #include <thread>
 
 using namespace rack;
 
 namespace {
+  struct CurlCleanup {
+    CURL* curl = nullptr;
+    curl_slist* headers = nullptr;
+    char* requestBody = nullptr;
+    json_t* requestJson = nullptr;
+    json_t* responseJson = nullptr;
+
+    ~CurlCleanup() {
+      if (requestBody) {
+        free(requestBody);
+      }
+
+      if (requestJson) {
+        json_decref(requestJson);
+      }
+
+      if (responseJson) {
+        json_decref(responseJson);
+      }
+
+      if (headers) {
+        curl_slist_free_all(headers);
+      }
+
+      if (curl) {
+        curl_easy_cleanup(curl);
+      }
+    }
+  };
+
+  size_t writeCallback(void* contents, size_t size, size_t nmemb, void* userp) {
+    size_t total = size * nmemb;
+    auto* response = static_cast<std::string*>(userp);
+    response->append(static_cast<char*>(contents), total);
+    return total;
+  }
+
   void fail(GitHubIntegration::Callback callback, std::string error) {
     callback(GitHubIntegration::Result{false, error, {}});
   }
@@ -29,14 +62,29 @@ void GitHubIntegration::fetchNormalizedContributions(std::string nameAndToken, i
         return;
       }
 
-      httplib::SSLClient client("api.github.com");
-      client.enable_server_certificate_verification(false);
+      CURL* curl = curl_easy_init();
+      if (!curl) {
+        fail(callback, "Failed to initialize curl");
+        return;
+      }
 
-      httplib::Headers headers = {
-        {"Authorization", "Bearer " + token},
-        {"Content-Type", "application/json"},
-        {"User-Agent", "cpp-httplib-plugin"}
-      };
+      CurlCleanup cleanup;
+      cleanup.curl = curl;
+
+      curl_easy_setopt(curl, CURLOPT_URL, "https://api.github.com/graphql");
+      curl_easy_setopt(curl, CURLOPT_CONNECTTIMEOUT, 10L);
+      curl_easy_setopt(curl, CURLOPT_TIMEOUT, 30L);
+      curl_easy_setopt(curl, CURLOPT_NOSIGNAL, 1L);
+      curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 0L);
+      curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L);
+
+      struct curl_slist* headers = nullptr;
+      headers = curl_slist_append(headers, ("Authorization: Bearer " + token).c_str());
+      headers = curl_slist_append(headers, "Accept: application/vnd.github+json");
+      headers = curl_slist_append(headers, "Content-Type: application/json");
+      headers = curl_slist_append(headers, "User-Agent: bikeshed-vcv-rack");
+      cleanup.headers = headers;
+      curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
 
       std::string header, requestScope, responseScope;
       if (username.empty()) {
@@ -52,34 +100,61 @@ void GitHubIntegration::fetchNormalizedContributions(std::string nameAndToken, i
       std::string query = "contributionsCollection { contributionCalendar { weeks { contributionDays { contributionCount weekday } } } }";
       std::string body = header + " { " + requestScope + " { " + query + " } }";
 
-      nlohmann::json jsonBody;
-      jsonBody["query"] = body;
+      json_t* jsonBody = json_object();
+      cleanup.requestJson = jsonBody;
+      json_object_set_new(jsonBody, "query", json_string(body.c_str()));
       if (!username.empty()) {
-        jsonBody["variables"] = {{"username", username}};
+        json_t* variables = json_object();
+        json_object_set_new(variables, "username", json_string(username.c_str()));
+        json_object_set_new(jsonBody, "variables", variables);
       }
 
-      if (auto res = client.Post("/graphql", headers, jsonBody.dump(), "application/json")) {
-        if (res->status == 200) {
-          try {
-            auto json = nlohmann::json::parse(res->body);
-            auto calendar = json.at("data").at(responseScope).at("contributionsCollection").at("contributionCalendar");
-            auto normalizedContributions = normalizeContributions(calendar, length, includeWeekends);
-            callback(GitHubIntegration::Result{true, "", normalizedContributions});
-          } catch (...) {
-            DEBUG("%s", res->body.c_str());
-            fail(callback, "Parsing error");
-          }
-        } else if (res->status == 401) {
-          fail(callback, "Bad token (401)");
-        } else if (res->status == 403) {
-          fail(callback, "Unauthorized (403)");
-        } else if (res->status >= 500) {
-          fail(callback, string::f("API error (%i)", res->status));
-        } else if (res->status >= 400) {
-          fail(callback, string::f("Request error (%i)", res->status));
-        } else {
-          fail(callback, string::f("Error (%i)", res->status));
+      char* requestBody = json_dumps(jsonBody, JSON_COMPACT);
+      cleanup.requestBody = requestBody;
+      curl_easy_setopt(curl, CURLOPT_POSTFIELDS, requestBody);
+
+      std::string response;
+      curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response);
+      curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writeCallback);
+
+      CURLcode result = curl_easy_perform(curl);
+      if (result != CURLE_OK) {
+        fail(callback, curl_easy_strerror(result));
+        return;
+      }
+
+      long status = 0;
+      curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &status);
+
+      if (status == 200) {
+        json_error_t error;
+        json_t* json = json_loads(response.c_str(), 0, &error);
+        cleanup.responseJson = json;
+        if (!json) {
+          DEBUG("%s", response.c_str());
+          fail(callback, "Parsing error");
+          return;
         }
+
+        json_t* errors = json_object_get(json, "errors");
+        if (errors) {
+          fail(callback, "GitHub API error");
+          return;
+        }
+
+        json_t* data = json_object_get(json, "data");
+        json_t* scope = json_object_get(data, responseScope.c_str());
+        json_t* collection = json_object_get(scope, "contributionsCollection");
+        json_t* calendar = json_object_get(collection, "contributionCalendar");
+
+        auto normalized = normalizeContributions(calendar, length, includeWeekends);
+        callback({ true, "", normalized });
+      } else if (status == 401) {
+        fail(callback, "Bad token (401)");
+      } else if (status == 403) {
+        fail(callback, "Unauthorized (403)");
+      } else if (status >= 500) {
+        fail(callback, string::f("Error (%i)", status));
       } else {
         fail(callback, "Failed");
       }
@@ -89,18 +164,21 @@ void GitHubIntegration::fetchNormalizedContributions(std::string nameAndToken, i
   }).detach();
 }
 
-std::vector<float> GitHubIntegration::normalizeContributions(const nlohmann::json& calendar, int length, bool includeWeekends) {
+std::vector<float> GitHubIntegration::normalizeContributions(json_t* calendar, int length, bool includeWeekends) {
   std::vector<int> contributions;
 
   int maxValue = 0;
-  auto weeks = calendar.at("weeks");
-  for (int w = (int)weeks.size() - 1; w >= 0 && contributions.size() < (size_t)length; --w) {
-    const auto& days = weeks.at(w).at("contributionDays");
-    for (int d = (int)days.size() - 1; d >= 0 && contributions.size() < (size_t)length; --d) {
-      auto day = days.at(d);
-      int weekday = day.at("weekday").get<int>();
+  json_t* weeks = json_object_get(calendar, "weeks");
+  for (int w = json_array_size(weeks) - 1; w >= 0 && contributions.size() < (size_t)length; --w) {
+    json_t* week = json_array_get(weeks, w);
+    json_t* days = json_object_get(week, "contributionDays");
+
+    for (int d = json_array_size(days) - 1; d >= 0 && contributions.size() < (size_t)length; --d) {
+      json_t* day = json_array_get(days, d);
+      int weekday = json_integer_value(json_object_get(day, "weekday"));
+
       if (includeWeekends || (weekday != 0 && weekday != 6)) {
-        int value = days.at(d).at("contributionCount").get<int>();
+        int value = json_integer_value(json_object_get(day, "contributionCount"));
         contributions.push_back(value);
         maxValue = std::max(value, maxValue);
       }

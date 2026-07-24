@@ -1,6 +1,6 @@
 #pragma once
 
-#include <nlohmann/json_fwd.hpp>
+#include <rack.hpp>
 
 #include <functional>
 #include <string>
@@ -18,5 +18,5 @@ struct GitHubIntegration {
   static void fetchNormalizedContributions(std::string nameAndToken, int length, bool includeWeekends, Callback callback);
 
 private:
-  static std::vector<float> normalizeContributions(const nlohmann::json& contributions, int length, bool includeWeekends);
+  static std::vector<float> normalizeContributions(json_t* contributions, int length, bool includeWeekends);
 };
