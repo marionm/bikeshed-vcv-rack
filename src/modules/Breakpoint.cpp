@@ -41,19 +41,23 @@ struct Breakpoint : Module {
   Breakpoint() {
     config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
 
+    // TODO: Sync input
     configInput(AUDIO_INPUT, "Audio");
     configInput(CLOCK_INPUT, "Clock");
 
     configOutput(MIX_OUTPUT, "Mix");
     configOutput(WET_OUTPUT, "Wet");
 
-    configParam(DELAY_PARAM, 0.f, 1.f, .5f, "Delay");
+    // TODO: Snapping, tooltip units, depending on clock input connectedness
+    configParam(DELAY_PARAM, 0.f, 8.f, 1.f, "Delay");
     configParam(MIX_PARAM, 0.f, 1.f, .5f, "Mix");
-    configParam(SPEED_PARAM, -1.f, 1.f, .5f, "Playback speed");
+    // TODO: Snap to ints, and fractions? But still allow smooth? Possible?
+    configParam(SPEED_PARAM, 0.f, 16.f, 2.f, "Playback speed");
 
+    // TODO: More CV inputs - delay
     std::string speedCvLabel = "Playback speed CV";
     configInput(SPEED_CV_INPUT, speedCvLabel);
-    configParam(SPEED_CV_PARAM, -1.f, 1.f, .5f, speedCvLabel);
+    configParam(SPEED_CV_PARAM, -1.f, 1.f, 0.f, speedCvLabel);
 
     configButton(MASK_PARAM, "Mask dry output");
   }
