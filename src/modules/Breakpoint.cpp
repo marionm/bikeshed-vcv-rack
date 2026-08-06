@@ -149,8 +149,8 @@ struct BreakpointWidget : app::ModuleWidget {
     float y = 82;
     float d = 16;
     addParam(createParamCentered<MediumKnob<false, true>>(mm2px(Vec(x + d * 0, y)), module, Breakpoint::DELAY_PARAM));
-    addParam(createParamCentered<MediumKnob<>>(mm2px(Vec(x + d * 1, y)), module, Breakpoint::MIX_PARAM));
-    addParam(createParamCentered<MediumKnob<>>(mm2px(Vec(x + d * 2, y)), module, Breakpoint::SPEED_PARAM));
+    addParam(createParamCentered<MediumKnob<false, true>>(mm2px(Vec(x + d * 1, y)), module, Breakpoint::MIX_PARAM));
+    addParam(createParamCentered<MediumKnob<false, true>>(mm2px(Vec(x + d * 2, y)), module, Breakpoint::SPEED_PARAM));
     addParam(createLightParamCentered<VCVLightLatch<MediumSimpleLight<WhiteLight>>>(mm2px(Vec(x + d * 3, y)), module, Breakpoint::MASK_PARAM, Breakpoint::MASK_LIGHT));
 
     x = 67.74;
