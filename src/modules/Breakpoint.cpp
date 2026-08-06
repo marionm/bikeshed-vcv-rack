@@ -70,9 +70,8 @@ struct Breakpoint : Module {
     recordingBuffer.push(audioIn);
 
     clockDivider.setDivision(params[DELAY_PARAM].getValue());
-    bool clockElapsed = clockDivider.process();
+    bool clockElapsed = clockTrigger.process(inputs[CLOCK_INPUT].getVoltage()) && clockDivider.process();
     bool timeElapsed = timer.process(args.sampleTime) >= params[DELAY_PARAM].getValue();
-
     bool trigger = getInput(CLOCK_INPUT).isConnected() ? clockElapsed : timeElapsed;
     lights[TRIGGER_DEBUG_LIGHT].setSmoothBrightness(trigger, args.sampleTime);
     if (trigger) {
