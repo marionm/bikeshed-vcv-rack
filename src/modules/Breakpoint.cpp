@@ -63,6 +63,9 @@ struct Breakpoint : Module {
   }
 
   void process(const ProcessArgs& args) override {
+    bool masked = params[MASK_PARAM].getValue() >= .5f;
+    lights[MASK_LIGHT].setBrightness(masked ? 1.f : 0.f);
+
     float audioIn = inputs[AUDIO_INPUT].getVoltage();
     recordingBuffer.push(audioIn);
 
