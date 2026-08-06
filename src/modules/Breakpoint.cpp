@@ -66,6 +66,7 @@ struct Breakpoint : Module {
     bool masked = params[MASK_PARAM].getValue() >= .5f;
     lights[MASK_LIGHT].setBrightness(masked ? 1.f : 0.f);
 
+    // TODO: Before or after trigger clear?
     float audioIn = inputs[AUDIO_INPUT].getVoltage();
     recordingBuffer.push(audioIn);
 
@@ -77,7 +78,8 @@ struct Breakpoint : Module {
     if (trigger) {
       clockDivider.reset();
       timer.reset();
-      i = 0;
+      playbackIndex = 0;
+      playbackIndexish = 0.f;
       size = recordingBuffer.size();
       recordingBuffer.shiftBuffer(playbackBuffer, size);
       recordingBuffer.clear();
@@ -86,22 +88,34 @@ struct Breakpoint : Module {
     lights[PLAYING_DEBUG_LIGHT].setSmoothBrightness(playing, args.sampleTime);
 
     bool stopped = false;
-    if (i >= size) {
-      i = 0;
+    if (playbackIndex >= size) {
       playing = false;
       stopped = true;
     }
     lights[STOPPED_DEBUG_LIGHT].setSmoothBrightness(stopped, args.sampleTime);
 
-    if (i2++ % 4410 == 0) {
-      DEBUG("i: %i, size: %i, playing %i", i, size, playing);
+    if (logStep++ % 4410 == 0) {
+      DEBUG("i: %i, size: %i, playing %i", playbackIndex, size, playing);
     }
 
     float dryOut, wetOut;
     if (playing) {
-      dryOut = params[MASK_PARAM].getValue() >= .5f ? 0.f : audioIn;
-      wetOut = playbackBuffer[i];
-      i++;
+      dryOut = masked ? 0.f : audioIn;
+
+      playbackIndexish += params[SPEED_PARAM].getValue();
+      int nextPlaybackIndex = (int)playbackIndexish;
+
+      // TODO: Better interpolation
+      //   * Cubic
+      //   * Cross-playbacks, when speed < 1
+      //   * Into dry when speed > 1 and masked (or even when not?)
+      wetOut = crossfade(
+        playbackBuffer[playbackIndex],
+        nextPlaybackIndex < size ? playbackBuffer[nextPlaybackIndex] : 0,
+        .5f
+      );
+
+      playbackIndex = nextPlaybackIndex;
     } else {
       dryOut = audioIn;
       wetOut = 0.f;
@@ -112,8 +126,9 @@ struct Breakpoint : Module {
   }
 
   bool playing = false;
-  int i = 0;
-  int i2 = 0;
+  int playbackIndex = 0;
+  float playbackIndexish = 0.f;
+  int logStep = 0;
   int size = 0;
   static constexpr int bufferSize = 1 << 21;
 
