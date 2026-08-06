@@ -14,6 +14,13 @@
   "changelogUrl": "https://github.com/marionm/bikeshed-vcv-rack/blob/main/CHANGELOG.md",
   "modules": [
     {
+      "slug": "Breakpoint",
+      "name": "Breakpoint",
+      "description": "???",
+      "manualUrl": "https://github.com/marionm/bikeshed-vcv-rack/blob/main/doc/Breakpoint.md",
+      "tags": ["Delay"]
+    },
+    {
       "slug": "EntropyPool",
       "name": "Entropy Pool",
       "description": "Indexable randomness",

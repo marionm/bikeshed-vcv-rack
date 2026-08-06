@@ -4,6 +4,7 @@
 
 using namespace rack;
 
+extern Model* breakpointModel;
 extern Model* entropyPoolModel;
 extern Model* entropyPuddleModel;
 extern Plugin* pluginInstance;
