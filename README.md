@@ -30,15 +30,11 @@ It contains the [JetBrains Mono](https://www.jetbrains.com/lp/mono) font and a m
 [League Mono](https://github.com/theleagueof/league-mono) font, both of which are licensed under
 the [SIL Open Font License 1.1](https://openfontlicense.org/open-font-license-official-text).
 
+It contains Signalsmith [Stretch](https://github.com/Signalsmith-Audio/signalsmith-stretch) and
+[Linear](https://github.com/Signalsmith-Audio/linear), both licensed under the MIT License.
+
 The SVGs used (in res) are distributed under the Creative Commons CC-BY-NC-SA-4.0 and are copyright
 the authors with authorship indicated by the GitHub transaction log.
 
 Copyright to this software is held by the authors with authorship indicated by the GitHub
 transaction log.
-
-## Third-party software
-
-This project includes Signalsmith Stretch and Signalsmith Linear, © 2022 Geraint Luff / Signalsmith
-Audio Ltd., licensed under the MIT License. Their license texts are included in:
-- `src/extern/signalsmith-stretch/LICENSE.txt`
-- `src/extern/signalsmith-linear/LICENSE.txt`
