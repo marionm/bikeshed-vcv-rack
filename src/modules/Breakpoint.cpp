@@ -1,6 +1,9 @@
 #include "Bikeshed.hpp"
 #include "components/Knob.hpp"
+#include "dsp/Timestretcher.hpp"
 
+#include <algorithm>
+#include <cmath>
 #include <math.hpp>
 
 using namespace bikeshed;
@@ -52,7 +55,7 @@ struct Breakpoint : Module {
     configParam(DELAY_PARAM, 0.f, 8.f, 1.f, "Delay");
     configParam(MIX_PARAM, 0.f, 1.f, .5f, "Mix");
     // TODO: Snap to ints, and fractions? But still allow smooth? Possible?
-    configParam(SPEED_PARAM, 0.f, 16.f, 2.f, "Playback speed");
+    configParam(SPEED_PARAM, 0.125f, 16.f, 2.f, "Playback speed");
 
     // TODO: More CV inputs - delay
     std::string speedCvLabel = "Playback speed CV";
@@ -66,9 +69,15 @@ struct Breakpoint : Module {
     bool masked = params[MASK_PARAM].getValue() >= .5f;
     lights[MASK_LIGHT].setBrightness(masked ? 1.f : 0.f);
 
-    // TODO: Before or after trigger clear?
     float audioIn = inputs[AUDIO_INPUT].getVoltage();
-    recordingBuffer.push(audioIn);
+    if (!isCapturing) {
+      startCapture();
+    }
+    if (isCapturing) {
+      timestretcher.pushInput(audioIn);
+      timestretcher.render();
+      advancePendingOutputSwitch();
+    }
 
     clockDivider.setDivision(params[DELAY_PARAM].getValue());
     bool clockElapsed = clockTrigger.process(inputs[CLOCK_INPUT].getVoltage()) && clockDivider.process();
@@ -78,66 +87,159 @@ struct Breakpoint : Module {
     if (trigger) {
       clockDivider.reset();
       timer.reset();
-      playbackIndex = 0;
-      playbackIndexish = 0.f;
-      size = recordingBuffer.size();
-      recordingBuffer.shiftBuffer(playbackBuffer, size);
-      recordingBuffer.clear();
-      playing = true;
-    }
-    lights[PLAYING_DEBUG_LIGHT].setSmoothBrightness(playing, args.sampleTime);
-
-    bool stopped = false;
-    if (playbackIndex >= size) {
-      playing = false;
-      stopped = true;
-    }
-    lights[STOPPED_DEBUG_LIGHT].setSmoothBrightness(stopped, args.sampleTime);
-
-    if (logStep++ % 4410 == 0) {
-      DEBUG("i: %i, size: %i, playing %i", playbackIndex, size, playing);
+      if (isCapturing && pendingOutputSlot < 0) {
+        finishCapture();
+      }
     }
 
-    float dryOut, wetOut;
-    if (playing) {
-      dryOut = masked ? 0.f : audioIn;
+    float wetOut = readWet();
+    bool wetActive = isWetActive();
+    float dryTarget = (wetActive && masked) ? 0.f : 1.f;
+    float dryStep = args.sampleTime / dryFadeTime;
+    dryGain += std::max(-dryStep, std::min(dryStep, dryTarget - dryGain));
 
-      playbackIndexish += params[SPEED_PARAM].getValue();
-      int nextPlaybackIndex = (int)playbackIndexish;
+    lights[PLAYING_DEBUG_LIGHT].setSmoothBrightness(wetActive, args.sampleTime);
+    lights[STOPPED_DEBUG_LIGHT].setSmoothBrightness(!wetActive, args.sampleTime);
 
-      // TODO: Better interpolation
-      //   * Cubic
-      //   * Cross-playbacks, when speed < 1
-      //   * Into dry when speed > 1 and masked (or even when not?)
-      wetOut = crossfade(
-        playbackBuffer[playbackIndex],
-        nextPlaybackIndex < size ? playbackBuffer[nextPlaybackIndex] : 0,
-        .5f
-      );
-
-      playbackIndex = nextPlaybackIndex;
-    } else {
-      dryOut = audioIn;
-      wetOut = 0.f;
-    }
+    float dryOut = audioIn * dryGain;
 
     outputs[MIX_OUTPUT].setVoltage(crossfade(dryOut, wetOut, params[MIX_PARAM].getValue()));
-    outputs[WET_OUTPUT].setVoltage(playing ? wetOut : 0.f);
+    outputs[WET_OUTPUT].setVoltage(wetOut);
   }
 
-  bool playing = false;
-  int playbackIndex = 0;
-  float playbackIndexish = 0.f;
-  int logStep = 0;
-  int size = 0;
+  void onSampleRateChange(const SampleRateChangeEvent& e) override {
+    timestretcher.setSampleRate(e.sampleRate);
+    // The active playback generation remains valid. Start a new capture with
+    // a stretcher configured for the new rate on the next sample.
+    isCapturing = false;
+    pendingOutputSlot = -1;
+    renderSlot = playbackSlot >= 0 ? 1 - playbackSlot : 0;
+  }
+
+  float getLatchedPlaybackSpeed() {
+    float speedCv = inputs[SPEED_CV_INPUT].getVoltage() * params[SPEED_CV_PARAM].getValue();
+    return clamp(params[SPEED_PARAM].getValue() + speedCv, 0.125f, 16.f);
+  }
+
+  void startCapture() {
+    playbackSizes[renderSlot] = 0;
+    timestretcher.setPlaybackSpeed(getLatchedPlaybackSpeed());
+    timestretcher.setOutputBuffer(playbackBuffers[renderSlot], bufferSize);
+    isCapturing = true;
+  }
+
+  void finishCapture() {
+    timestretcher.finish();
+    playbackSizes[renderSlot] = timestretcher.getRenderedSampleCount();
+    if (playbackSizes[renderSlot] == 0) {
+      return;
+    }
+
+    fadeSlot = playbackSlot;
+    fadeIndex = playbackIndex;
+    fadeSampleCount = (fadeSlot >= 0 && fadeIndex < playbackSizes[fadeSlot])
+      ? std::min<size_t>(transitionSamples, playbackSizes[fadeSlot] - fadeIndex)
+      : 0;
+    playbackSlot = renderSlot;
+    playbackIndex = 0;
+    transitionRemaining = static_cast<int>(fadeSampleCount);
+    pendingOutputSlot = 1 - renderSlot;
+    inputSamplesUntilOutputSwitch = timestretcher.getInputLatencySampleCount();
+    // The newly latched rate applies to the stream immediately. During the
+    // pending window its output extends the old playback buffer; after the
+    // switch it fills the new logical capture buffer.
+    timestretcher.setPlaybackSpeed(getLatchedPlaybackSpeed());
+    if (inputSamplesUntilOutputSwitch == 0) {
+      switchOutputBuffer();
+    }
+  }
+
+  void advancePendingOutputSwitch() {
+    if (pendingOutputSlot < 0 || inputSamplesUntilOutputSwitch == 0) {
+      return;
+    }
+    if (--inputSamplesUntilOutputSwitch == 0) {
+      switchOutputBuffer();
+    }
+  }
+
+  void switchOutputBuffer() {
+    // Keep a render block wholly within one logical capture generation.
+    timestretcher.finish();
+    playbackSizes[renderSlot] = timestretcher.getRenderedSampleCount();
+    renderSlot = pendingOutputSlot;
+    pendingOutputSlot = -1;
+    playbackSizes[renderSlot] = 0;
+    timestretcher.setOutputBuffer(playbackBuffers[renderSlot], bufferSize);
+  }
+
+  size_t getAvailableSampleCount(int slot) const {
+    if (slot == renderSlot) {
+      return timestretcher.getRenderedSampleCount();
+    }
+    return playbackSizes[slot];
+  }
+
+  float readSlot(int slot, size_t& index) {
+    if (slot < 0 || index >= getAvailableSampleCount(slot)) {
+      return 0.f;
+    }
+    return playbackBuffers[slot][index++];
+  }
+
+  float readFadeSample() {
+    if (fadeSlot < 0 || transitionRemaining <= 0) {
+      return 0.f;
+    }
+    return playbackBuffers[fadeSlot][fadeIndex++];
+  }
+
+  bool isWetActive() const {
+    return (playbackSlot >= 0 && playbackIndex < getAvailableSampleCount(playbackSlot)) ||
+      transitionRemaining > 0;
+  }
+
+  float readWet() {
+    float playback = readSlot(playbackSlot, playbackIndex);
+    if (transitionRemaining > 0) {
+      float previous = readFadeSample();
+      float t = 1.f - static_cast<float>(transitionRemaining) / fadeSampleCount;
+      float result = std::cos(0.5f * M_PI * t) * previous + std::sin(0.5f * M_PI * t) * playback;
+      if (--transitionRemaining == 0) {
+        fadeSlot = -1;
+        fadeIndex = 0;
+        fadeSampleCount = 0;
+      }
+      return result;
+    }
+    return playback;
+  }
+
+  // Supports just under 11 seconds at 192 kHz. Two fixed output generations
+  // reserve 16 MiB; the outgoing playback tail is faded inline while its slot
+  // is reused from the beginning for the next capture.
   static constexpr int bufferSize = 1 << 21;
+  static constexpr int outputBufferCount = 2;
+  static constexpr int transitionSamples = 256;
+  static constexpr float dryFadeTime = 0.005f;
+  float playbackBuffers[outputBufferCount][bufferSize];
+  size_t playbackSizes[outputBufferCount] = {};
+  int renderSlot = 0;
+  int playbackSlot = -1;
+  int fadeSlot = -1;
+  size_t playbackIndex = 0;
+  size_t fadeIndex = 0;
+  size_t fadeSampleCount = 0;
+  int transitionRemaining = 0;
+  int pendingOutputSlot = -1;
+  size_t inputSamplesUntilOutputSwitch = 0;
+  bool isCapturing = false;
+  float dryGain = 1.f;
+  Timestretcher timestretcher;
 
   dsp::SchmittTrigger clockTrigger;
   dsp::ClockDivider clockDivider;
   dsp::Timer timer;
-
-  dsp::RingBuffer<float, bufferSize> recordingBuffer;
-  float playbackBuffer[bufferSize];
 };
 
 struct BreakpointWidget : app::ModuleWidget {
@@ -173,6 +275,7 @@ struct BreakpointWidget : app::ModuleWidget {
     x = 111.74;
     addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(x + d * 0, y)), module, Breakpoint::MIX_OUTPUT));
     addOutput(createOutputCentered<PJ301MPort>(mm2px(Vec(x + d * 1, y)), module, Breakpoint::WET_OUTPUT));
+
   }
 };
 
