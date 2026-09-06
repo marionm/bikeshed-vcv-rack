@@ -16,21 +16,21 @@
     {
       "slug": "Breakpoint",
       "name": "Breakpoint",
-      "description": "???",
+      "description": "Time-stretched buffer delay",
       "manualUrl": "https://github.com/marionm/bikeshed-vcv-rack/blob/main/doc/Breakpoint.md",
       "tags": ["Delay"]
     },
     {
       "slug": "EntropyPool",
       "name": "Entropy Pool",
-      "description": "Indexable randomness",
+      "description": "240 step randomizable sequencer with range and value filtering",
       "manualUrl": "https://github.com/marionm/bikeshed-vcv-rack/blob/main/doc/EntropyPool.md",
       "tags": ["Random", "Sequencer"]
     },
     {
       "slug": "EntropyPuddle",
       "name": "Entropy Puddle",
-      "description": "Indexable randomness",
+      "description": "96 step randomizable sequencer with range and value filtering",
       "manualUrl": "https://github.com/marionm/bikeshed-vcv-rack/blob/main/doc/EntropyPuddle.md",
       "tags": ["Random", "Sequencer"]
     }
