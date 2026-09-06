@@ -35,3 +35,10 @@ the authors with authorship indicated by the GitHub transaction log.
 
 Copyright to this software is held by the authors with authorship indicated by the GitHub
 transaction log.
+
+## Third-party software
+
+This project includes Signalsmith Stretch and Signalsmith Linear, © 2022 Geraint Luff / Signalsmith
+Audio Ltd., licensed under the MIT License. Their license texts are included in:
+- `src/extern/signalsmith-stretch/LICENSE.txt`
+- `src/extern/signalsmith-linear/LICENSE.txt`
